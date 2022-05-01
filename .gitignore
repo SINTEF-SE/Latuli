@@ -1,3 +1,7 @@
 files/
 target/
+<<<<<<< HEAD
+=======
+.DS_Store
+>>>>>>> lg_transformation_tool
 /bin/
