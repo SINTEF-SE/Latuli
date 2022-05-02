@@ -2,6 +2,10 @@ package ui;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,18 +39,18 @@ public class DatasetGenerator {
 		  System.out.println("Enter start datetime (yyyy-MM-dd'T'HH:mm:ss): "); 
 		  String startDateTime = input.nextLine();
 		  
-		  System.out.println("Enter end datetime (yyyy-MM-dd'T'HH:mm:ss): "); 
+		  System.out.println("\nEnter end datetime (yyyy-MM-dd'T'HH:mm:ss): "); 
 		  String endDateTime = input.nextLine();
 		  
-		  System.out.println("Enter source folder for CSV files: "); 
+		  System.out.println("\nEnter existing source folder for CSV files: "); 
 		  String csvSource = input.nextLine();
 		  		  
-		  System.out.println("Enter folder where the generated knowledge graph will be stored:");
+		  System.out.println("\nEnter name of new folder where the generated knowledge graph will be stored:");
 		  String kg = input.nextLine();
 		  
 		  input.close(); 
 		  
-		  System.out.println("This process may take several minutes to complete...");	  
+		  System.out.println("\nThis process may take several minutes to complete...");	  
 		  
 		  String tmpSplitFiles = "tmpSplitFiles/";
 		  String tmpSplitFilesFiltered = "tmpSplitFilesFiltered/";
@@ -120,13 +124,43 @@ public class DatasetGenerator {
 //		createFullDatasetToNTriples(folderPath, outputFile);
 		
 		//remove the tmp dirs
-		tmpSplitFilesFolder.delete();
-		tmpSplitFilesFilteredFolder.delete();
+		//tmpSplitFilesFolder.delete();
+		//tmpSplitFilesFilteredFolder.delete();
+		
+		try {
+			deleteFolder(tmpSplitFilesFolder.toPath());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		try {
+			deleteFolder(tmpSplitFilesFilteredFolder.toPath());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		stopwatch.stop();
 		System.out.println("The knowledge graph generation process took: " + stopwatch.elapsed(TimeUnit.MINUTES) + " minutes.");
 
 	}
+	/**
+	 * Delete tmp folders after KG has been generated.
+	 * @param path
+	 * @throws IOException
+	   2. mai 2022
+	 */
+	private static void deleteFolder(Path path) throws IOException {
+		  if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
+		    try (DirectoryStream<Path> entries = Files.newDirectoryStream(path)) {
+		      for (Path entry : entries) {
+		        deleteFolder(entry);
+		      }
+		    }
+		  }
+		  Files.delete(path);
+		}
 	
 	/**
 	 * Creates a dataset from csv data and represents the KG as TSV
