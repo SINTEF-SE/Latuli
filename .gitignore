@@ -1,1 +1,6 @@
+files/
+target/
+.DS_Store
+ontology/
+http/
 /bin/
