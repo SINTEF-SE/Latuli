@@ -27,51 +27,56 @@ import csv2KG.Waves;
 import csv2KG.XDocLoadingUnits;
 import csvfiltering.CSVProcessor;
 
-public class DatasetGenerator {
+public class KGGenerator {
 
 	public static void main(String[] args) {
-		
-		  Stopwatch stopwatch = Stopwatch.createStarted();
 
-		  
-		  Scanner input = new Scanner(System.in);
-		  
-		  System.out.println("Enter start datetime (yyyy-MM-dd'T'HH:mm:ss): "); 
-		  String startDateTime = input.nextLine();
-		  
-		  System.out.println("\nEnter end datetime (yyyy-MM-dd'T'HH:mm:ss): "); 
-		  String endDateTime = input.nextLine();
-		  
-		  System.out.println("\nEnter existing source folder for CSV files: "); 
-		  String csvSource = input.nextLine();
-		  		  
-		  System.out.println("\nEnter name of new folder where the generated knowledge graph will be stored:");
-		  String kg = input.nextLine();
-		  
-		  input.close(); 
-		  
-		  System.out.println("\nThis process may take several minutes to complete...");	  
-		  
-		  String tmpSplitFiles = "tmpSplitFiles/";
-		  String tmpSplitFilesFiltered = "tmpSplitFilesFiltered/";
-		  
+		Stopwatch stopwatch = Stopwatch.createStarted();
+
+		Scanner input = new Scanner(System.in);
+
+		System.out.println("Would you like the knowledge graph as TSV (1) or N-Triples (2)?");
+		String fileFormat = input.nextLine();
+
+		System.out.println("Enter start datetime (yyyy-MM-dd'T'HH:mm:ss): "); 
+		String startDateTime = input.nextLine();
+
+		System.out.println("\nEnter end datetime (yyyy-MM-dd'T'HH:mm:ss): "); 
+		String endDateTime = input.nextLine();
+
+		System.out.println("\nEnter existing source folder for CSV files: "); 
+		String csvSource = input.nextLine();
 		
-//TESTING  
-//		String startDateTime = "2019-12-01T00:00:00";
-//		String endDateTime = "2020-03-28T00:00:00";
-//		String csvSource = "./files/TEST_ORIGINAL_CSV/";
-//		String kg = "./files/kg-output/";
-//		String tmpSplitFiles = "./files/tmpSplitFiles/";
-//		String tmpSplitFilesFiltered = "./files/tmpSplitFilesFiltered/";
+		System.out.println("\nDo your CSV files contain a header (Y or N)?: "); 
+		String header = input.nextLine();
 		
+		if (header.equalsIgnoreCase("Y")) {
+			try {
+				System.out.println("Removing the header from all CSV files...");
+				CSVProcessor.removeFirstLineFromFilesInFolder(csvSource);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		System.out.println("\nEnter name of new folder where the generated knowledge graph will be stored:");
+		String kg = input.nextLine();
+
+		input.close(); 
+
+		System.out.println("\nThis process may take several minutes to complete...");	  
+
+		String tmpSplitFiles = "tmpSplitFiles/";
+		String tmpSplitFilesFiltered = "tmpSplitFilesFiltered/";
+
 		int chunkSize = 50;
-		
-		//File csvSourceFolder = new File(csvSource);
+
 		File tmpSplitFilesFolder = new File(tmpSplitFiles);
 		File tmpSplitFilesFilteredFolder = new File (tmpSplitFilesFiltered);
 		File csvSourceFolder = new File (csvSource);
 		File kgFolder = new File (kg);
-		
+
 		if (!csvSourceFolder.exists()) {
 			csvSourceFolder.mkdir();
 		} if (!tmpSplitFilesFolder.exists()) {
@@ -81,9 +86,9 @@ public class DatasetGenerator {
 		} if (!kgFolder.exists()) {
 			kgFolder.mkdir();
 		} 
-		
+
 		List<File> list = new ArrayList<>();
-		
+
 		try {
 			list = CSVProcessor.createFileList(csvSource);
 		} catch (IOException e1) {
@@ -100,7 +105,7 @@ public class DatasetGenerator {
 				e.printStackTrace();
 			}
 		}
-		
+
 		try {
 			System.out.println("Starting filtering on period...");
 			CSVProcessor.filterOnPeriod(startDateTime, endDateTime, tmpSplitFiles, tmpSplitFilesFiltered);
@@ -111,29 +116,24 @@ public class DatasetGenerator {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
-		String outputFile = kg + "/KG.tsv";
-		
-		System.out.println("Creating the knowledge graph and storing the KG file as " + outputFile);
-		createFullDatasetToTSV(tmpSplitFilesFiltered, outputFile);
 
-		//if creating the full dataset to n-triples (expensive!)
-//		String folderPath = "./files/CSV/Audun/_ORIGINAL_CSV";
-//		String outputFile = "files/CSV/Audun/full_dataset.nt";
-//		createFullDatasetToNTriples(folderPath, outputFile);
-		
-		//remove the tmp dirs
-		//tmpSplitFilesFolder.delete();
-		//tmpSplitFilesFilteredFolder.delete();
-		
+
+		if (fileFormat.equals("1")) {
+			System.out.println("Creating the knowledge graph and storing the KG file as " + kg + "/KG.tsv");
+			createFullDatasetToTSV(tmpSplitFilesFiltered, kg + "/KG.tsv");
+		} else {
+			System.out.println("Creating the knowledge graph and storing the KG file as " + kg + "/KG.nt");
+			createFullDatasetToNTriples(tmpSplitFilesFiltered, kg + "/KG.nt");	
+		}
+
+		//remove tmp folders after KG file generation
 		try {
 			deleteFolder(tmpSplitFilesFolder.toPath());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		try {
 			deleteFolder(tmpSplitFilesFilteredFolder.toPath());
 		} catch (IOException e) {
@@ -145,23 +145,9 @@ public class DatasetGenerator {
 		System.out.println("The knowledge graph generation process took: " + stopwatch.elapsed(TimeUnit.MINUTES) + " minutes.");
 
 	}
-	/**
-	 * Delete tmp folders after KG has been generated.
-	 * @param path
-	 * @throws IOException
-	   2. mai 2022
-	 */
-	private static void deleteFolder(Path path) throws IOException {
-		  if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
-		    try (DirectoryStream<Path> entries = Files.newDirectoryStream(path)) {
-		      for (Path entry : entries) {
-		        deleteFolder(entry);
-		      }
-		    }
-		  }
-		  Files.delete(path);
-		}
 	
+
+
 	/**
 	 * Creates a dataset from csv data and represents the KG as TSV
 	 * @param tmpSplitFilesFilteredFolder
@@ -247,8 +233,8 @@ public class DatasetGenerator {
 		}
 
 	}
-		
-	
+
+
 	/**
 	 * Creates a dataset from csv data and represents the KG as N-Triples
 	 * @param folderPath
@@ -334,8 +320,25 @@ public class DatasetGenerator {
 		}
 
 	}
-
 	
+	/**
+	 * Delete tmp folders after KG has been generated.
+	 * @param path
+	 * @throws IOException
+	   2. mai 2022
+	 */
+	private static void deleteFolder(Path path) throws IOException {
+		if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
+			try (DirectoryStream<Path> entries = Files.newDirectoryStream(path)) {
+				for (Path entry : entries) {
+					deleteFolder(entry);
+				}
+			}
+		}
+		Files.delete(path);
+	}
+
+
 
 	public static String formatCoordinates (String coordinates) {
 		return "POINT(" + coordinates.substring(0, coordinates.indexOf(",")) + " " + coordinates.substring(coordinates.indexOf(",")+1, coordinates.length()) + ")";

@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.io.Reader;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -25,35 +26,45 @@ import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 
+import utilities.StringUtilities;
+
 public class CSVProcessor {
 
 	public static void main(String[] args) throws ParseException, IOException {
 
-		
-		String startDateTime = "2019-12-01";
-		String endDateTime = "2019-12-31";
-		String sourceFolder = "./files/CSV/Audun/_ORIGINAL_CSV/";
-		String tmpSplitFiles = "./files/output/";
-		String tmpSplitFilesFiltered = "./files/CSV/Audun/_FILTER_PERIOD_"+startDateTime+"_"+endDateTime+"/";
+		String startDateTime = "2019-12-01"; String endDateTime = "2019-12-31";
+		String sourceFolder = "./files/CSV/Audun/_ORIGINAL_CSV/"; 
+		String tmpSplitFiles = "./files/output/"; 
+		String tmpSplitFilesFiltered = "./files/CSV/Audun/_FILTER_PERIOD_"+startDateTime+"_"+endDateTime+"/"; 
 		String targetFolderFile = "./files/CSV/Audun/csv_target_folders.txt";
 		filterOnPeriod(startDateTime, endDateTime, sourceFolder, tmpSplitFilesFiltered);
-		
-		String csvSourceFolder = "./files/ORIGINAL_CSV/";	
+
+		String csvSourceFolder = "./files/ORIGINAL_CSV/"; 
 		File output = new File(tmpSplitFiles);
 
-		if (!output.exists()) {
-			output.mkdir();
-		}
-		
+		if (!output.exists()) { output.mkdir(); }
+
 		List<File> list = createFileList(csvSourceFolder);
 
-		for (File file : list) {
-			System.out.println("Processing file: " + file.getName());
-			splitCSV(file.getPath(), tmpSplitFiles, 50);
+		for (File file : list) { 
+			System.out.println("Processing file: " + file.getName()); 
+			splitCSV(file.getPath(), tmpSplitFiles, 50); 
 		}
-		
+
+
+		//test join files
+		File outputFile = new File("./files/out/test.csv");
+		File folder = new File ("./files/CSV/Audun/FILTER_PERIOD_1_6_2020/consignments_split_filtered");
+
+		joinFiles(folder, outputFile);
+
+		removeFirstLineFromFilesInFolder("./files/DATASETS/NEW_3M_DATASET");
+
+		StringUtilities.addCoordinatesToParties("./files/DATASETS/NEW_3M_DATASET/parties.csv", "./files/DATASETS/ORIGINAL_CSV/parties.csv", "./files/DATASETS/NEW_3M_DATASET/partiesWCoordinates.csv");
+
+
 	}
-	
+
 	public static void splitCSV(String inputFile, String outputFolder, int chunkSizeInMb) throws IOException {
 
 		//create a folder to hold the chunks
@@ -62,7 +73,7 @@ public class CSVProcessor {
 		if (!chunkFolder.exists()) {
 			chunkFolder.mkdir();
 		}
-		
+
 		//get the core filename
 		String fileName = inputFile.substring(inputFile.lastIndexOf("/"), inputFile.lastIndexOf("."));
 
@@ -72,22 +83,22 @@ public class CSVProcessor {
 		int fileSize = 0;
 		BufferedWriter fos = new BufferedWriter(new FileWriter(chunkFolder + "/" + fileName + "_" +new Date().getTime()+".csv",true));
 		while((line = bufferedReader.readLine()) != null) {
-				if(fileSize + line.getBytes().length > chunkSizeInMb * 1024 * 1024){
-						fos.flush();
-						fos.close();
-						fos = new BufferedWriter(new FileWriter(chunkFolder + "/" + fileName + "_" +new Date().getTime()+".csv",true));
-						fos.write(line+"\n");
-						fileSize = line.getBytes().length;
-				}else{
-						fos.write(line+"\n");
-						fileSize += line.getBytes().length;
-				}
+			if(fileSize + line.getBytes().length > chunkSizeInMb * 1024 * 1024){
+				fos.flush();
+				fos.close();
+				fos = new BufferedWriter(new FileWriter(chunkFolder + "/" + fileName + "_" +new Date().getTime()+".csv",true));
+				fos.write(line+"\n");
+				fileSize = line.getBytes().length;
+			}else{
+				fos.write(line+"\n");
+				fileSize += line.getBytes().length;
+			}
 		}          
 		fos.flush();
 		fos.close();
 		bufferedReader.close();
-		}
-	
+	}
+
 
 	public static List<File> createFileList(String dir) throws IOException {
 		List<File> fileList = new ArrayList<File>();
@@ -107,7 +118,7 @@ public class CSVProcessor {
 				"relevant_shipment_ids", "relevant_transport_ids", "xdlu_split_filtered", "consignments_split_filtered",
 				"loadingunits_split_filtered", "waves_split_filtered", "tradeitems_split_filtered", "dgr_split_filtered",
 				"shipmentitems_split_filtered", "shipments_split_filtered", "transports_split_filtered"};
-		
+
 		//create the parent target folder
 		File p_folder = new File(splitCSVFilesFilteredFolder);
 
@@ -116,7 +127,7 @@ public class CSVProcessor {
 		}
 
 		File t_folder = null;
-		
+
 		for (String s : listOfFolders) {
 			t_folder = new File(splitCSVFilesFilteredFolder + s);
 			if (!t_folder.exists()) {
@@ -260,11 +271,8 @@ public class CSVProcessor {
 				e.printStackTrace();
 			}
 
-			//System.out.println("\nReading file: " + filesInDir[i].getPath());
-
 			try {
 				while ((line = br.readLine()) != null) {
-				//while ((line = br.readLine()) != null && !line.startsWith(",") && Character.isDigit(line.charAt(0))) {
 
 					params = line.split(",");
 
@@ -308,7 +316,7 @@ public class CSVProcessor {
 		String id = null;
 		try {
 			while ((id = br.readLine()) != null) {
-				
+
 
 				shipmentItemIds.add(id);
 
@@ -339,11 +347,8 @@ public class CSVProcessor {
 				e.printStackTrace();
 			}
 
-			//System.out.println("\nReading file: " + filesInDir[i].getPath());
-
 			try {
 				while ((line = br.readLine()) != null) {
-				//while ((line = br.readLine()) != null && !line.startsWith(",") && Character.isDigit(line.charAt(0))) {
 
 					params = line.split(",");
 
@@ -417,11 +422,8 @@ public class CSVProcessor {
 				e.printStackTrace();
 			}
 
-			//System.out.println("\nReading file: " + filesInDir[i].getPath());
-
 			try {
 				while ((line = br.readLine()) != null) {
-				//while ((line = br.readLine()) != null && !line.startsWith(",") && Character.isDigit(line.charAt(0))) {
 
 					params = line.split(",");
 
@@ -495,11 +497,8 @@ public class CSVProcessor {
 				e.printStackTrace();
 			}
 
-			//System.out.println("\nReading file: " + filesInDir[i].getPath());
-
 			try {
 				while ((line = br.readLine()) != null) {
-				//while ((line = br.readLine()) != null && !line.startsWith(",") && Character.isDigit(line.charAt(0))) {
 
 					params = line.split(",");
 
@@ -573,11 +572,8 @@ public class CSVProcessor {
 				e.printStackTrace();
 			}
 
-			//System.out.println("\nReading file: " + filesInDir[i].getPath());
-
 			try {
 				while ((line = br.readLine()) != null) {
-				//while ((line = br.readLine()) != null && !line.startsWith(",") && Character.isDigit(line.charAt(0))) {
 
 					params = line.split(",");
 
@@ -630,7 +626,7 @@ public class CSVProcessor {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		File splitFolder = new File(inputFolder);
 
 		File[] filesInDir = splitFolder.listFiles();
@@ -653,11 +649,8 @@ public class CSVProcessor {
 				e.printStackTrace();
 			}
 
-			//System.out.println("\nReading file: " + filesInDir[i].getPath());
-
 			try {
 				while ((line = br.readLine()) != null) {
-				//while ((line = br.readLine()) != null && !line.startsWith(",") && Character.isDigit(line.charAt(0))) {
 
 					params = line.split(",");
 
@@ -731,11 +724,8 @@ public class CSVProcessor {
 				e.printStackTrace();
 			}
 
-			//System.out.println("\nReading file: " + filesInDir[i].getPath());
-
 			try {
 				while ((line = br.readLine()) != null) {
-				//while ((line = br.readLine()) != null && !line.startsWith(",") && Character.isDigit(line.charAt(0))) {
 
 					params = line.split(",");
 
@@ -810,11 +800,8 @@ public class CSVProcessor {
 				e.printStackTrace();
 			}
 
-			//System.out.println("\nReading file: " + filesInDir[i].getPath());
-
 			try {
 				while ((line = br.readLine()) != null) {
-				//while ((line = br.readLine()) != null && !line.startsWith(",") && Character.isDigit(line.charAt(0))) {
 
 					params = line.split(",");
 
@@ -1055,10 +1042,7 @@ public class CSVProcessor {
 
 				br = new BufferedReader(new FileReader(filesInDir[i]));
 
-				//System.out.println("\nReading file: " + filesInDir[i].getPath());
-
 				while ((line = br.readLine()) != null) {
-				//while ((line = br.readLine()) != null && !line.startsWith(",") && Character.isDigit(line.charAt(0))) {
 
 					params = line.split(",");
 
@@ -1185,6 +1169,8 @@ public class CSVProcessor {
 
 			String line;		
 
+			//System.out.println("Filtering file: " + filesInDir[i].getPath());
+
 			try {
 				br = new BufferedReader(new FileReader(filesInDir[i]));
 			} catch (FileNotFoundException e) {
@@ -1196,12 +1182,8 @@ public class CSVProcessor {
 				e.printStackTrace();
 			}
 
-			//System.out.println("\nReading file: " + filesInDir[i].getPath());
-
-
 			try {
 				while ((line = br.readLine()) != null) {
-				//while ((line = br.readLine()) != null && !line.startsWith(",") && Character.isDigit(line.charAt(0))) {
 
 					params = line.split(",");
 
@@ -1266,9 +1248,6 @@ public class CSVProcessor {
 				e.printStackTrace();
 			}
 
-			//System.out.println("\nReading file: " + filesInDir[i].getPath());
-
-
 			try {
 				while ((line = br.readLine()) != null) {
 
@@ -1325,6 +1304,10 @@ public class CSVProcessor {
 
 	private static boolean withinPeriod (String input, String start, String end) throws ParseException {
 
+		//System.out.println("Input: " + input);
+		//System.out.println("Start date: " + start);
+		//System.out.println("End date: " + end);
+
 		boolean withinPeriod = false;
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -1347,6 +1330,77 @@ public class CSVProcessor {
 		return dateTime;
 	}
 
+	public static File joinFiles (File inputFolder, File output) throws IOException {
+		//File output = File.createTempFile("output", ".csv");
+		try (FileWriter fw = new FileWriter(output); 
+				BufferedWriter bw = new BufferedWriter(fw)) {
 
+			for (File file : inputFolder.listFiles()) {
+				try (FileReader fr = new FileReader(file); 
+						BufferedReader br = new BufferedReader(fr)) {
+					String line;
+
+					// Start to parse the file at the first row containing data
+					while ((line = br.readLine()) != null) {
+
+						bw.write(line);
+						bw.newLine();
+					}
+				}
+			}
+
+		}
+
+		return output;
+
+	}
+
+
+	public static void removeFirstLineFromFilesInFolder(String folder) throws IOException {  
+
+
+		File[] files = new File(folder).listFiles();
+
+		for (File f : files) {
+			RandomAccessFile raf = new RandomAccessFile(f.getPath(), "rw");
+			//Initial write position                                             
+			long writePosition = raf.getFilePointer();                            
+			raf.readLine();                                                       
+			// Shift the next lines upwards.                                      
+			long readPosition = raf.getFilePointer();                             
+
+			byte[] buff = new byte[1024];                                         
+			int n;                                                                
+			while (-1 != (n = raf.read(buff))) {                                  
+				raf.seek(writePosition);                                          
+				raf.write(buff, 0, n);                                            
+				readPosition += n;                                                
+				writePosition += n;                                               
+				raf.seek(readPosition);                                           
+			}                                                                     
+			raf.setLength(writePosition);                                         
+			raf.close();    
+		}
+
+
+		//RandomAccessFile raf = new RandomAccessFile(fileName, "rw");          
+		//Initial write position                                             
+		//		long writePosition = raf.getFilePointer();                            
+		//		raf.readLine();                                                       
+		//		// Shift the next lines upwards.                                      
+		//		long readPosition = raf.getFilePointer();                             
+		//
+		//		byte[] buff = new byte[1024];                                         
+		//		int n;                                                                
+		//		while (-1 != (n = raf.read(buff))) {                                  
+		//			raf.seek(writePosition);                                          
+		//			raf.write(buff, 0, n);                                            
+		//			readPosition += n;                                                
+		//			writePosition += n;                                               
+		//			raf.seek(readPosition);                                           
+		//		}                                                                     
+		//		raf.setLength(writePosition);                                         
+		//		raf.close();                                                          
+	}  
 
 }

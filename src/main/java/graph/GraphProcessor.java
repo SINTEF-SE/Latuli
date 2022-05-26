@@ -3,8 +3,12 @@ package graph;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+
+import com.google.gson.Gson;
 
 public class GraphProcessor {
 	
@@ -30,6 +34,16 @@ public class GraphProcessor {
 		for (String s : vertexSinkSet) {
 			System.out.println(s);
 		}
+		
+		Map<Integer, String> colours = new HashMap<>();
+        
+        Gson gson = new Gson();
+        
+        String output = gson.toJson(colours);
+        
+        System.out.println(output);
 	}
+	
+	
 
 }
