@@ -20,6 +20,8 @@ import org.eclipse.rdf4j.repository.RepositoryConnection;
 import utilities.KGUtilities;
 import utilities.StringUtilities;
 
+import geocoding.Coordinates;
+
 /**
  * @author audunvennesland
  *
@@ -107,7 +109,7 @@ public class Parties {
 					bw.write(KGUtilities.createDataProperty(partyEntity, baseURI, "isConsignor", params[14], DATATYPE_INT, tripleClosure));
 
 					//asWKT
-					bw.write(KGUtilities.createGeoDataProperty(partyEntity, baseURI, geoSparqlDataProperty, StringUtilities.formatCoordinates(params[19]), geoSparqlTripleClosure));
+					bw.write(KGUtilities.createGeoDataProperty(partyEntity, baseURI, geoSparqlDataProperty, Coordinates.formatCoordinates(params[19]), geoSparqlTripleClosure));
 
 
 				}//end for
@@ -297,7 +299,7 @@ public class Parties {
 						connection.add(partyInd, vf.createIRI(baseURI + "isShipper"), vf.createLiteral(params[12], XMLSchema.INT));
 						connection.add(partyInd, vf.createIRI(baseURI + "isCarrier"), vf.createLiteral(params[13], XMLSchema.INT));
 						connection.add(partyInd, vf.createIRI(baseURI + "isConsignor"), vf.createLiteral(params[14], XMLSchema.INT));
-						connection.add(partyInd, vf.createIRI(geosparqlURI + "asWKT"), vf.createLiteral(StringUtilities.formatCoordinates(params[19]), GEO.WKT_LITERAL));
+						connection.add(partyInd, vf.createIRI(geosparqlURI + "asWKT"), vf.createLiteral(Coordinates.formatCoordinates(params[19]), GEO.WKT_LITERAL));
 
 					}
 
@@ -375,7 +377,7 @@ public class Parties {
 						connection.add(partyInd, vf.createIRI(baseURI + "isShipper"), vf.createLiteral(params[12], XMLSchema.INT));
 						connection.add(partyInd, vf.createIRI(baseURI + "isCarrier"), vf.createLiteral(params[13], XMLSchema.INT));
 						connection.add(partyInd, vf.createIRI(baseURI + "isConsignor"), vf.createLiteral(params[14], XMLSchema.INT));
-						connection.add(partyInd, vf.createIRI(geosparqlURI + "asWKT"), vf.createLiteral(StringUtilities.formatCoordinates(params[19]), GEO.WKT_LITERAL));
+						connection.add(partyInd, vf.createIRI(geosparqlURI + "asWKT"), vf.createLiteral(Coordinates.formatCoordinates(params[19]), GEO.WKT_LITERAL));
 
 					}
 

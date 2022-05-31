@@ -1,6 +1,7 @@
 package utilities;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -15,8 +16,10 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
@@ -46,148 +49,13 @@ public class StringUtilities {
 	static OWLReasonerFactory reasonerFactory = new StructuralReasonerFactory();
 
 
-	public static void main(String[] args){
+	public static void main(String[] args) throws IOException{
 
-		String timeStampOrg = "2019-05-31 05:02:43.3800000";
-		String timeStamp = convertToDateTime(timeStampOrg);
-		int epoch = convertToEpoch(timeStamp);
-
-		System.out.println(epoch);
-
+		
 
 	}
+
 	
-	public static void addCoordinatesToParties (String partiesWOCoordinates, String partiesWCoordinates, String outputFilePath) {
-
-		//get the hashCode and corresponding coordinates from the partiesWCoordinates file
-		Map<String, String> coordinatesMap = new HashMap<String, String>();
-
-		File partiesWCoordinatesFile = new File(partiesWCoordinates);
-		List<String[]> line = new ArrayList<String[]>();
-
-		BufferedReader br = null;
-		try {
-			br = new BufferedReader(new FileReader(partiesWCoordinatesFile));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-
-
-		try {
-			line = StringUtilities.oneByOne(br);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-
-		for (String[] params : line) {
-
-			coordinatesMap.put(params[2], params[19]);
-
-		}
-
-		try {
-			br.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		//read parties wo coordinates into Party from parties.csv 			
-		Party p = null;			
-		Set<Party> partySet = new HashSet<Party>();
-		File partiesWOCoordinatesFile = new File (partiesWOCoordinates);
-
-		try {
-			br = new BufferedReader(new FileReader(partiesWOCoordinatesFile));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-
-
-		try {
-			line = StringUtilities.oneByOne(br);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		String coords = null;
-		
-		for (String[] params : line) {
-			
-			//get coordinates for this party
-			coords = coordinatesMap.get(params[2]);
-
-			p = new Party.PartyBuilder()
-					.setAdditionalPartyIdentification(params[0])
-					.setGLN(params[1])
-					.setHashCode(params[2])
-					.setPartyName(params[3])
-					.setAddressDetail(params[4])
-					.setStreet(params[5])
-					.setCode3(params[6])
-					.setCode2(params[7])
-					.setLocation(params[8])
-					.setPostalCode(params[9])
-					.setModifiedOn(params[10])
-					.setIsHub(params[11])
-					.setIsShipper(params[12])
-					.setIsCarrier(params[13])
-					.setIsConsignor(params[14])
-					.setIsReadOnly(params[15])
-					.setBarCodeFormat(params[16])
-					.setSimplifiedCode(params[17])
-					.setOriginalDataSource(params[18])
-					.setCoordinates(coords)
-					.build();			
-			
-			partySet.add(p);
-
-		}
-
-		try {
-			br.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		//print parties with coordinates to csv
-		File newPartiesCSVWithCoordinatesFile = new File (outputFilePath);
-		
-		FileWriter outputFile = null;
-		try {
-			outputFile = new FileWriter(newPartiesCSVWithCoordinatesFile);
-		} catch (IOException e2) {
-			e2.printStackTrace();
-		}
-		
-		CSVWriter writer = new CSVWriter(outputFile);
-	
-		
-		for (Party party : partySet) {
-			
-			String[] csvLine = {party.getAdditionalPartyIdentification(), party.getGln(), party.getHashCode(),party.getPartyName(),party.getAddressDetail(),
-					party.getStreet(),party.getCode3(),party.getCode2(),party.getLocation(),party.getPostalCode(),party.getModifiedOn(),party.getIsHub(), 
-					party.getIsShipper(),party.getIsCarrier(),party.getIsConsignor(),party.getIsReadOnly(),
-					party.getBarCodeFormat(),party.getSimplifiedCode(),party.getOriginalDataSource(), party.getCoordinates()};
-			
-			writer.writeNext(csvLine);
-
-			
-		}
-		
-		try {
-			writer.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		
-
-	}
-
-	public static String formatCoordinates (String coordinates) {
-		return "POINT(" + coordinates.substring(0, coordinates.indexOf(",")) + " " + coordinates.substring(coordinates.indexOf(",")+1, coordinates.length()) + ")";
-	}
 
 	public static List<String[]> oneByOne(Reader reader) throws Exception {
 		List<String[]> list = new ArrayList<>();
@@ -228,15 +96,15 @@ public class StringUtilities {
 
 	public static Integer convertToEpoch(String timestamp){
 
-		  if(timestamp == null) return null;
-		  try {
-		    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-		    Date dt = sdf.parse(timestamp);
-		    long epoch = dt.getTime();
-		    return (int)(epoch/1000);
-		  } catch(ParseException e) {
-		     return null;
-		  }
+		if(timestamp == null) return null;
+		try {
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+			Date dt = sdf.parse(timestamp);
+			long epoch = dt.getTime();
+			return (int)(epoch/1000);
+		} catch(ParseException e) {
+			return null;
+		}
 
 
 	}

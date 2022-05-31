@@ -32,36 +32,35 @@ public class CSVProcessor {
 
 	public static void main(String[] args) throws ParseException, IOException {
 
-		String startDateTime = "2019-12-01"; String endDateTime = "2019-12-31";
-		String sourceFolder = "./files/CSV/Audun/_ORIGINAL_CSV/"; 
-		String tmpSplitFiles = "./files/output/"; 
-		String tmpSplitFilesFiltered = "./files/CSV/Audun/_FILTER_PERIOD_"+startDateTime+"_"+endDateTime+"/"; 
-		String targetFolderFile = "./files/CSV/Audun/csv_target_folders.txt";
-		filterOnPeriod(startDateTime, endDateTime, sourceFolder, tmpSplitFilesFiltered);
+//		String startDateTime = "2019-12-01"; String endDateTime = "2019-12-31";
+//		String sourceFolder = "./files/CSV/Audun/_ORIGINAL_CSV/"; 
+//		String tmpSplitFiles = "./files/output/"; 
+//		String tmpSplitFilesFiltered = "./files/CSV/Audun/_FILTER_PERIOD_"+startDateTime+"_"+endDateTime+"/"; 
+//		String targetFolderFile = "./files/CSV/Audun/csv_target_folders.txt";
+//		filterOnPeriod(startDateTime, endDateTime, sourceFolder, tmpSplitFilesFiltered);
+//
+//		String csvSourceFolder = "./files/ORIGINAL_CSV/"; 
+//		File output = new File(tmpSplitFiles);
+//
+//		if (!output.exists()) { output.mkdir(); }
+//
+//		List<File> list = createFileList(csvSourceFolder);
+//
+//		for (File file : list) { 
+//			System.out.println("Processing file: " + file.getName()); 
+//			splitCSV(file.getPath(), tmpSplitFiles, 50); 
+//		}
+//
+//
+//		//test join files
+//		File outputFile = new File("./files/out/test.csv");
+//		File folder = new File ("./files/CSV/Audun/FILTER_PERIOD_1_6_2020/consignments_split_filtered");
+//
+//		joinFiles(folder, outputFile);
+//
+//		removeFirstLineFromFilesInFolder("./files/DATASETS/NEW_3M_DATASET");
 
-		String csvSourceFolder = "./files/ORIGINAL_CSV/"; 
-		File output = new File(tmpSplitFiles);
-
-		if (!output.exists()) { output.mkdir(); }
-
-		List<File> list = createFileList(csvSourceFolder);
-
-		for (File file : list) { 
-			System.out.println("Processing file: " + file.getName()); 
-			splitCSV(file.getPath(), tmpSplitFiles, 50); 
-		}
-
-
-		//test join files
-		File outputFile = new File("./files/out/test.csv");
-		File folder = new File ("./files/CSV/Audun/FILTER_PERIOD_1_6_2020/consignments_split_filtered");
-
-		joinFiles(folder, outputFile);
-
-		removeFirstLineFromFilesInFolder("./files/DATASETS/NEW_3M_DATASET");
-
-		StringUtilities.addCoordinatesToParties("./files/DATASETS/NEW_3M_DATASET/parties.csv", "./files/DATASETS/ORIGINAL_CSV/parties.csv", "./files/DATASETS/NEW_3M_DATASET/partiesWCoordinates.csv");
-
+		//StringUtilities.addCoordinatesToParties("./files/DATASETS/NEW_3M_DATASET/parties.csv", "./files/DATASETS/ORIGINAL_CSV/parties.csv", "./files/DATASETS/NEW_3M_DATASET/partiesWCoordinates.csv");
 
 	}
 
