@@ -27,12 +27,12 @@ import utilities.StringUtilities;
 public class GeoCoder {
 
 	private static final String GEOCODING_RESOURCE = "https://geocode.search.hereapi.com/v1/geocode";
-	private static final String API_KEY = "qAXPG2fcHh0FSxysOZMmUYKYFfKuDVd5epzANtxCkBg";
+	private static final String API_KEY = "INSERT_API_KEY";
 
 	public static void main(String[] args) throws IOException, InterruptedException {
 
-		String addresses = "./files/addresses_20_1000.csv";
-		String output = "./files/coordinates_20_1000.csv";
+		String addresses = "./files/addresses_0_20.csv";
+		String output = "./files/coordinates_0_20.csv";
 		getCoordinates(addresses, output);
 
 	}
