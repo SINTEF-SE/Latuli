@@ -16,10 +16,15 @@ import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
+import org.apache.commons.io.FileUtils;
 
 import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
@@ -32,35 +37,115 @@ public class CSVProcessor {
 
 	public static void main(String[] args) throws ParseException, IOException {
 
-//		String startDateTime = "2019-12-01"; String endDateTime = "2019-12-31";
-//		String sourceFolder = "./files/CSV/Audun/_ORIGINAL_CSV/"; 
-//		String tmpSplitFiles = "./files/output/"; 
-//		String tmpSplitFilesFiltered = "./files/CSV/Audun/_FILTER_PERIOD_"+startDateTime+"_"+endDateTime+"/"; 
-//		String targetFolderFile = "./files/CSV/Audun/csv_target_folders.txt";
-//		filterOnPeriod(startDateTime, endDateTime, sourceFolder, tmpSplitFilesFiltered);
-//
-//		String csvSourceFolder = "./files/ORIGINAL_CSV/"; 
-//		File output = new File(tmpSplitFiles);
-//
-//		if (!output.exists()) { output.mkdir(); }
-//
-//		List<File> list = createFileList(csvSourceFolder);
-//
-//		for (File file : list) { 
-//			System.out.println("Processing file: " + file.getName()); 
-//			splitCSV(file.getPath(), tmpSplitFiles, 50); 
-//		}
-//
-//
-//		//test join files
-//		File outputFile = new File("./files/out/test.csv");
-//		File folder = new File ("./files/CSV/Audun/FILTER_PERIOD_1_6_2020/consignments_split_filtered");
-//
-//		joinFiles(folder, outputFile);
-//
-//		removeFirstLineFromFilesInFolder("./files/DATASETS/NEW_3M_DATASET");
+		//		String startDateTime = "2019-12-01"; String endDateTime = "2019-12-31";
+		//		String sourceFolder = "./files/CSV/Audun/_ORIGINAL_CSV/"; 
+		//		String tmpSplitFiles = "./files/output/"; 
+		//		String tmpSplitFilesFiltered = "./files/CSV/Audun/_FILTER_PERIOD_"+startDateTime+"_"+endDateTime+"/"; 
+		//		String targetFolderFile = "./files/CSV/Audun/csv_target_folders.txt";
+		//		filterOnPeriod(startDateTime, endDateTime, sourceFolder, tmpSplitFilesFiltered);
+		//
+		//		String csvSourceFolder = "./files/ORIGINAL_CSV/"; 
+		//		File output = new File(tmpSplitFiles);
+		//
+		//		if (!output.exists()) { output.mkdir(); }
+		//
+		//		List<File> list = createFileList(csvSourceFolder);
+		//
+		//		for (File file : list) { 
+		//			System.out.println("Processing file: " + file.getName()); 
+		//			splitCSV(file.getPath(), tmpSplitFiles, 50); 
+		//		}
+		//
+		//
+		//		//test join files
+		//		File outputFile = new File("./files/out/test.csv");
+		//		File folder = new File ("./files/CSV/Audun/FILTER_PERIOD_1_6_2020/consignments_split_filtered");
+		//
+		//		joinFiles(folder, outputFile);
+		//
+		//		removeFirstLineFromFilesInFolder("./files/DATASETS/NEW_3M_DATASET");
 
 		//StringUtilities.addCoordinatesToParties("./files/DATASETS/NEW_3M_DATASET/parties.csv", "./files/DATASETS/ORIGINAL_CSV/parties.csv", "./files/DATASETS/NEW_3M_DATASET/partiesWCoordinates.csv");
+
+		String csvFileIn = "./files/DATASETS/2019_2022_OUT/consignments.csv";
+		String csvFileOut = "./files/DATASETS/FilteredByColumns/consignments.csv";
+		List<Integer> consignmentColumns = new LinkedList<Integer>(Arrays.asList(0,18,23,32,33,34,35,36,40,41));
+
+
+		filterCSVByColumns(csvFileIn, csvFileOut, consignmentColumns);
+
+	}
+
+	public static void filterCSVByColumns(String csvFileIn, String csvFileOut, List<Integer> columns) {
+
+
+		BufferedReader br = null;
+		BufferedWriter bw = null;
+
+		List<String[]> line = new ArrayList<String[]>();
+
+
+		try {
+			br = new BufferedReader(new FileReader(csvFileIn));
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		}
+		try {
+			bw = new BufferedWriter(new FileWriter(csvFileOut));
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+
+
+		try {
+			line = StringUtilities.oneByOne(br);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+
+		for (String[] params : line) {
+
+			Iterator<Integer> colsIterator = columns.iterator();
+
+			while (colsIterator.hasNext()) {
+
+				int col = colsIterator.next();
+
+				try {
+					//write cols and comma unless last col
+					if (!colsIterator.hasNext()) {
+						bw.write(params[col]);
+					} else {
+						bw.write(params[col] + ",");
+					}
+
+				} catch (IOException e) {
+					e.printStackTrace();
+				}				
+
+			}
+			try {
+				bw.write("\n");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+		}//end for
+
+
+		try {
+			br.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		try {
+			bw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 
 	}
 
@@ -172,13 +257,112 @@ public class CSVProcessor {
 		filterConsignments(consignments_folder_in, consignments_folder_filtered, consignmentIdFile);		
 		filterLoadingUnits(loadingUnits_folder_in, loadingUnits_folder_filtered, loadingUnitIdFile);		
 		filterWaves(waves_folder_in, waves_folder_filtered, waveIdFile);		
-		filterTradeItems(tradeItems_folder_in, tradeItems_folder_filtered, loadingUnitIdFile);	
-		filterDangerousGoods(dgr_folder_in, dgr_folder_filtered, loadingUnitIdFile);		
+		//filterTradeItems(tradeItems_folder_in, tradeItems_folder_filtered, loadingUnitIdFile);	
+		//filterDangerousGoods(dgr_folder_in, dgr_folder_filtered, loadingUnitIdFile);		
 		printRelevantShipmentIds (shipmentItems_folder_in, loadingUnitIdFile, shipmentIdFile);			
 		filterShipmentItems(shipmentItems_folder_in, shipmentItems_folder_filtered, shipmentIdFile);			
 		filterShipments(shipments_folder_in, shipments_folder_filtered, shipmentIdFile);			
-		printRelevantTransports(consignments_folder_in, consignmentIdFile, transportIdFile);
-		filterTransports (transports_folder_in, transports_folder_filtered, transportIdFile);
+		//printRelevantTransports(consignments_folder_in, consignmentIdFile, transportIdFile);
+		//filterTransports (transports_folder_in, transports_folder_filtered, transportIdFile);
+
+	}
+
+	public static void filterOnColumns(String inputFolder, String outputFolder, List<Integer> xdlu_columns, List<Integer> consignment_columns, List<Integer> shipment_columns,
+			List<Integer> shipmentItems_columns, List<Integer> loadingUnit_columns, List<Integer> wave_columns) throws ParseException, IOException {
+
+		createFolders(outputFolder);
+
+		String xdlu_folder_in = inputFolder + "xdlu_split_filtered";
+		String consignments_folder_in = inputFolder + "consignments_split_filtered";
+		String loadingUnits_folder_in = inputFolder + "loadingunits_split_filtered";
+		String waves_folder_in = inputFolder + "waves_split_filtered";
+		//String tradeItems_folder_in = splitCSVFiles + "tradeitems_split";
+		//String dgr_folder_in = splitCSVFiles + "dgr_split";
+		String shipmentItems_folder_in = inputFolder + "shipmentitems_split_filtered";
+		String shipments_folder_in = inputFolder + "shipments_split_filtered";
+		//String transports_folder_in = splitCSVFiles + "transports_split";		
+
+		String xdlu_folder_out = outputFolder + "xdlu_split_filtered";
+		String consignments_folder_filtered = outputFolder + "consignments_split_filtered";
+		String loadingUnits_folder_filtered = outputFolder + "loadingunits_split_filtered";
+		String waves_folder_filtered = outputFolder + "waves_split_filtered";
+//		String tradeItems_folder_filtered = outputFolder + "tradeitems_split_filtered";
+//		String dgr_folder_filtered = outputFolder + "dgr_split_filtered";
+		String shipmentItems_folder_filtered = outputFolder + "shipmentitems_split_filtered";
+		String shipments_folder_filtered = outputFolder + "shipments_split_filtered";
+//		String transports_folder_filtered = outputFolder + "transports_split_filtered";
+
+		filterXDocLoadingUnitsByColumns (xdlu_folder_in, xdlu_folder_out, xdlu_columns);		
+		filterConsignmentsByColumns(consignments_folder_in, consignments_folder_filtered, consignment_columns);		
+		filterLoadingUnitsByColumns(loadingUnits_folder_in, loadingUnits_folder_filtered, loadingUnit_columns);		
+		filterWavesByColumns(waves_folder_in, waves_folder_filtered, wave_columns);		
+		//filterTradeItems(tradeItems_folder_in, tradeItems_folder_filtered, loadingUnitIdFile);	
+		//filterDangerousGoods(dgr_folder_in, dgr_folder_filtered, loadingUnitIdFile);		
+		filterShipmentItemsByColumns(shipmentItems_folder_in, shipmentItems_folder_filtered, shipmentItems_columns);			
+		filterShipmentsByColumns(shipments_folder_in, shipments_folder_filtered, shipment_columns);			
+		//filterTransports (transports_folder_in, transports_folder_filtered, transportIdFile);
+
+	}
+	
+
+	private static void filterXDocLoadingUnitsByColumns(String inputFolder, String filteredFolder, List<Integer> columns) {
+		File folder = new File (inputFolder);
+		File[] files = folder.listFiles();
+		
+		for (File f : files) {
+			filterCSVByColumns(f.getPath(), f.getPath().replace(inputFolder, filteredFolder), columns);
+		}
+		
+
+	}
+
+	private static void filterConsignmentsByColumns(String inputFolder, String filteredFolder, List<Integer> columns) {
+		File folder = new File (inputFolder);
+		File[] files = folder.listFiles();
+		
+		for (File f : files) {
+			filterCSVByColumns(f.getPath(), f.getPath().replace(inputFolder, filteredFolder), columns);
+		}
+
+	}
+
+	private static void filterLoadingUnitsByColumns(String inputFolder, String filteredFolder, List<Integer> columns) {
+		File folder = new File (inputFolder);
+		File[] files = folder.listFiles();
+		
+		for (File f : files) {
+			filterCSVByColumns(f.getPath(), f.getPath().replace(inputFolder, filteredFolder), columns);
+		}
+
+	}
+
+	private static void filterWavesByColumns(String inputFolder, String filteredFolder, List<Integer> columns) {
+		File folder = new File (inputFolder);
+		File[] files = folder.listFiles();
+		
+		for (File f : files) {
+			filterCSVByColumns(f.getPath(), f.getPath().replace(inputFolder, filteredFolder), columns);
+		}
+
+	}
+
+	private static void filterShipmentItemsByColumns(String inputFolder, String filteredFolder, List<Integer> columns) {
+		File folder = new File (inputFolder);
+		File[] files = folder.listFiles();
+		
+		for (File f : files) {
+			filterCSVByColumns(f.getPath(), f.getPath().replace(inputFolder, filteredFolder), columns);
+		}
+
+	}
+
+	private static void filterShipmentsByColumns(String inputFolder, String filteredFolder, List<Integer> columns) {
+		File folder = new File (inputFolder);
+		File[] files = folder.listFiles();
+		
+		for (File f : files) {
+			filterCSVByColumns(f.getPath(), f.getPath().replace(inputFolder, filteredFolder), columns);
+		}
 
 	}
 
@@ -426,7 +610,7 @@ public class CSVProcessor {
 
 					params = line.split(",");
 
-					if (shipmentItemIds.contains(params[0])) {
+					if (shipmentItemIds.contains(params[1])) {
 
 						bw.write(line);
 						bw.newLine();
@@ -836,6 +1020,8 @@ public class CSVProcessor {
 	   29. apr. 2022
 	 */
 	private static void printRelevantShipmentIds (String inputFolder, String filterPath, String shipmentIdsFile) {
+		
+		System.out.println("inputFolder: " + inputFolder + ", filterPath: " + filterPath);
 
 		Set<String> shipmentIds = new HashSet<String>();
 
@@ -864,6 +1050,8 @@ public class CSVProcessor {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		System.out.println("number of entries in loadingUnitIds: " + loadingUnitIds.size());
 
 		List<String[]> line = new ArrayList<String[]>();
 
@@ -882,8 +1070,9 @@ public class CSVProcessor {
 			}
 
 			for (String[] s : line) {
-				if (loadingUnitIds.contains(s[1])) {
-					shipmentIds.add(s[0]);
+				
+				if (loadingUnitIds.contains(s[2])) {
+					shipmentIds.add(s[1]);
 				}
 			}
 
@@ -892,6 +1081,8 @@ public class CSVProcessor {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			
+			System.out.println("There are " + shipmentIds.size() + " relevant shipment ids");
 
 
 		}
@@ -1019,7 +1210,6 @@ public class CSVProcessor {
 	}
 
 	private static void printRelevantConLoadWave (String inputFolder, String loadingUnitIdFile, String consignmentIdFile, String waveIdFile) throws ParseException {
-
 
 		Set<String> consignmentIds = new HashSet<String>();
 		Set<String> waveIds = new HashSet<String>();
@@ -1303,10 +1493,6 @@ public class CSVProcessor {
 
 	private static boolean withinPeriod (String input, String start, String end) throws ParseException {
 
-		//System.out.println("Input: " + input);
-		//System.out.println("Start date: " + start);
-		//System.out.println("End date: " + end);
-
 		boolean withinPeriod = false;
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -1330,7 +1516,6 @@ public class CSVProcessor {
 	}
 
 	public static File joinFiles (File inputFolder, File output) throws IOException {
-		//File output = File.createTempFile("output", ".csv");
 		try (FileWriter fw = new FileWriter(output); 
 				BufferedWriter bw = new BufferedWriter(fw)) {
 
@@ -1382,24 +1567,6 @@ public class CSVProcessor {
 		}
 
 
-		//RandomAccessFile raf = new RandomAccessFile(fileName, "rw");          
-		//Initial write position                                             
-		//		long writePosition = raf.getFilePointer();                            
-		//		raf.readLine();                                                       
-		//		// Shift the next lines upwards.                                      
-		//		long readPosition = raf.getFilePointer();                             
-		//
-		//		byte[] buff = new byte[1024];                                         
-		//		int n;                                                                
-		//		while (-1 != (n = raf.read(buff))) {                                  
-		//			raf.seek(writePosition);                                          
-		//			raf.write(buff, 0, n);                                            
-		//			readPosition += n;                                                
-		//			writePosition += n;                                               
-		//			raf.seek(readPosition);                                           
-		//		}                                                                     
-		//		raf.setLength(writePosition);                                         
-		//		raf.close();                                                          
 	}  
 
 }

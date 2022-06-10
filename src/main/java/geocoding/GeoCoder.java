@@ -27,12 +27,12 @@ import utilities.StringUtilities;
 public class GeoCoder {
 
 	private static final String GEOCODING_RESOURCE = "https://geocode.search.hereapi.com/v1/geocode";
-	private static final String API_KEY = "INSERT_API_KEY";
+	private static final String API_KEY = "xt2MS-9bpxBxiKrGJIFZFnBwM_JP34GxIIrbIwmUGZ4";
 
 	public static void main(String[] args) throws IOException, InterruptedException {
 
-		String addresses = "./files/addresses_0_20.csv";
-		String output = "./files/coordinates_0_20.csv";
+		String addresses = "./files/addresses_30001_37722.csv";
+		String output = "./files/coordinates_30001_37722.csv";
 		getCoordinates(addresses, output);
 
 	}
@@ -75,11 +75,12 @@ public class GeoCoder {
 		
 			for (JsonNode item : items) {
 				JsonNode address = item.get("address");
-				//String label = address.get("label").asText();
 				JsonNode position = item.get("position");
 
 				String lat = position.get("lat").asText();
 				String lng = position.get("lng").asText();
+				
+				//System.out.println("Latitude is: " + lat + ", Longitude is: " + lng);
 				
 				loc = new Location.LocationBuilder()
 						.setStreet(params[0])
@@ -136,12 +137,13 @@ public class GeoCoder {
 		String requestUri = GEOCODING_RESOURCE + "?apiKey=" + API_KEY + "&q=" + encodedQuery;
 
 		HttpRequest geocodingRequest = HttpRequest.newBuilder().GET().uri(URI.create(requestUri))
-				.timeout(Duration.ofMillis(2000)).build();
+				.timeout(Duration.ofMillis(4000)).build();
 
 		HttpResponse geocodingResponse = httpClient.send(geocodingRequest,
 				HttpResponse.BodyHandlers.ofString());
+		
 
-		System.out.println("Response: " + geocodingResponse);
+		//System.out.println("Response: " + geocodingResponse);
 
 		return (String) geocodingResponse.body();
 	}

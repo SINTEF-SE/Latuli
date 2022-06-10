@@ -51,6 +51,10 @@ public class StringUtilities {
 
 	public static void main(String[] args) throws IOException{
 
+		String dateTime = "2022-06-02T10:00:00";
+		int epoch = convertToEpoch(dateTime);
+		
+		System.out.println(dateTime + " is converted to " + epoch);
 		
 
 	}
