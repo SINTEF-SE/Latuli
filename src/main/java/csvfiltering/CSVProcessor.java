@@ -30,6 +30,7 @@ import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
+import com.opencsv.CSVWriter;
 
 import utilities.StringUtilities;
 
@@ -67,14 +68,291 @@ public class CSVProcessor {
 
 		//StringUtilities.addCoordinatesToParties("./files/DATASETS/NEW_3M_DATASET/parties.csv", "./files/DATASETS/ORIGINAL_CSV/parties.csv", "./files/DATASETS/NEW_3M_DATASET/partiesWCoordinates.csv");
 
-		String csvFileIn = "./files/DATASETS/2019_2022_OUT/consignments.csv";
-		String csvFileOut = "./files/DATASETS/FilteredByColumns/consignments.csv";
-		List<Integer> consignmentColumns = new LinkedList<Integer>(Arrays.asList(0,18,23,32,33,34,35,36,40,41));
-
-
-		filterCSVByColumns(csvFileIn, csvFileOut, consignmentColumns);
+//		String csvFileIn = "./files/DATASETS/2019_2022_OUT/consignments.csv";
+//		String csvFileOut = "./files/DATASETS/FilteredByColumns/consignments.csv";
+//		List<Integer> consignmentColumns = new LinkedList<Integer>(Arrays.asList(0,18,23,32,33,34,35,36,40,41));
+//
+//
+//		filterCSVByColumns(csvFileIn, csvFileOut, consignmentColumns);
+		
+		
+		
+		String date = "2023-04-27 22:50:01.0270000";
+		
+		System.out.println("Is this a date? " + isDate(date));
+		
+		//2019-10-26T13:33
+		//2018-05-10T12:30
+		
+//		String newDate;
+//		if (date.startsWith("2019") || date.startsWith("2020") || date.startsWith("2021") || date.startsWith("2022")) {
+//			System.out.println("This is a date");
+//			newDate = StringUtilities.convertToDateTime(date);
+//		} else {
+//			System.out.println("This is not a date");
+//			newDate = date;
+//		}
+//		
+//		System.out.println(newDate);
+				
+				
+		//"^\\d{4}-\\d{2}-\\d{2}"		
+		
+		//convertDate(date);
+		
+		//correctDateTime("./files/DATASETS/FilteredByColumns/consignments.csv");
 
 	}
+	
+
+
+	
+	private static boolean isDate (String input) {
+		
+		if (input.startsWith("2019") || input.startsWith("2020") || input.startsWith("2021") || input.startsWith("2022")) {
+			
+			return true;
+			
+		} else {
+			
+			return false;
+		}
+		
+	}
+	
+	private static String convertDate (String date) {
+		
+		return date = StringUtilities.convertToShortenedDateTime(date);
+	 					
+	}
+	
+	public static void correctDateTime (String csvFileIn, String csvFileOut) {
+		
+		BufferedReader br = null;
+		
+        FileWriter outputfile = null;
+		try {
+			outputfile = new FileWriter(new File(csvFileOut));
+		} catch (IOException e2) {
+			e2.printStackTrace();
+		}
+  
+        CSVWriter writer = new CSVWriter(outputfile);
+
+		try {
+			br = new BufferedReader(new FileReader(csvFileIn));
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		}
+				
+		String line;
+		String[] params = null;
+
+		try {
+			while ((line = br.readLine()) != null) {
+				
+				params = line.split(",");
+				List<String> list = new LinkedList<String>();
+				
+				for (int i = 0; i < params.length; i++) {
+					
+					if (isDate(params[i])) {
+						list.add(convertDate(params[i]));
+					} else {
+						list.add(params[i]);
+					}
+				}
+				
+				String[]copy = list.toArray(new String[list.size()]);
+				writer.writeNext(copy);
+				
+			}
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		
+		try {
+			br.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void formatDates (String inputFolder, String outputFolder) throws IOException {	
+		
+		createFolders(outputFolder);
+		
+		String xdlu_folder_in = inputFolder + "xdlu_split_filtered";
+		String consignments_folder_in = inputFolder + "consignments_split_filtered";
+		String loadingUnits_folder_in = inputFolder + "loadingunits_split_filtered";
+		String waves_folder_in = inputFolder + "waves_split_filtered";
+		String shipmentItems_folder_in = inputFolder + "shipmentitems_split_filtered";
+		String shipments_folder_in = inputFolder + "shipments_split_filtered";
+
+		String xdlu_folder_out = outputFolder + "xdlu_split_filtered";
+		String consignments_folder_filtered = outputFolder + "consignments_split_filtered";
+		String loadingUnits_folder_filtered = outputFolder + "loadingunits_split_filtered";
+		String waves_folder_filtered = outputFolder + "waves_split_filtered";
+		String shipmentItems_folder_filtered = outputFolder + "shipmentitems_split_filtered";
+		String shipments_folder_filtered = outputFolder + "shipments_split_filtered";
+		
+		formatDatesInXDocLoadingUnits (xdlu_folder_in, xdlu_folder_out);		
+		formatDatesInConsignments(consignments_folder_in, consignments_folder_filtered);		
+		formatDatesInLoadingUnits(loadingUnits_folder_in, loadingUnits_folder_filtered);		
+		formatDatesInWaves(waves_folder_in, waves_folder_filtered);			
+		formatDatesInShipmentItems(shipmentItems_folder_in, shipmentItems_folder_filtered);			
+		formatDatesInShipments(shipments_folder_in, shipments_folder_filtered);		
+			
+	}
+	
+	private static void formatDatesInXDocLoadingUnits(String inputFolder, String filteredFolder) {
+		File folder = new File (inputFolder);
+		File[] files = folder.listFiles();
+		
+		for (File f : files) {
+			
+			correctDateTime(f.getPath(), f.getPath().replace(inputFolder, filteredFolder));
+		}
+	}
+	
+	private static void formatDatesInConsignments(String inputFolder, String filteredFolder) {
+		File folder = new File (inputFolder);
+		File[] files = folder.listFiles();
+		
+		for (File f : files) {
+			correctDateTime(f.getPath(), f.getPath().replace(inputFolder, filteredFolder));
+		}
+	}
+	private static void formatDatesInLoadingUnits(String inputFolder, String filteredFolder) {
+		File folder = new File (inputFolder);
+		File[] files = folder.listFiles();
+		
+		for (File f : files) {
+			correctDateTime(f.getPath(), f.getPath().replace(inputFolder, filteredFolder));
+		}
+	}
+	private static void formatDatesInWaves(String inputFolder, String filteredFolder) {
+		File folder = new File (inputFolder);
+		File[] files = folder.listFiles();
+		
+		for (File f : files) {
+			correctDateTime(f.getPath(), f.getPath().replace(inputFolder, filteredFolder));
+		}
+	}
+	private static void formatDatesInShipmentItems(String inputFolder, String filteredFolder) {
+		File folder = new File (inputFolder);
+		File[] files = folder.listFiles();
+		
+		for (File f : files) {
+			correctDateTime(f.getPath(), f.getPath().replace(inputFolder, filteredFolder));
+		}
+	}
+	private static void formatDatesInShipments(String inputFolder, String filteredFolder) {
+		File folder = new File (inputFolder);
+		File[] files = folder.listFiles();
+		
+		for (File f : files) {
+			correctDateTime(f.getPath(), f.getPath().replace(inputFolder, filteredFolder));
+		}
+	}
+	
+	public static void filterOnColumns(String inputFolder, String outputFolder, List<Integer> xdlu_columns, List<Integer> consignment_columns, List<Integer> shipment_columns,
+			List<Integer> shipmentItems_columns, List<Integer> loadingUnit_columns, List<Integer> wave_columns) throws ParseException, IOException {
+
+		createFolders(outputFolder);
+
+		String xdlu_folder_in = inputFolder + "xdlu_split_filtered";
+		String consignments_folder_in = inputFolder + "consignments_split_filtered";
+		String loadingUnits_folder_in = inputFolder + "loadingunits_split_filtered";
+		String waves_folder_in = inputFolder + "waves_split_filtered";
+		String shipmentItems_folder_in = inputFolder + "shipmentitems_split_filtered";
+		String shipments_folder_in = inputFolder + "shipments_split_filtered";
+
+		String xdlu_folder_out = outputFolder + "xdlu_split_filtered";
+		String consignments_folder_filtered = outputFolder + "consignments_split_filtered";
+		String loadingUnits_folder_filtered = outputFolder + "loadingunits_split_filtered";
+		String waves_folder_filtered = outputFolder + "waves_split_filtered";
+		String shipmentItems_folder_filtered = outputFolder + "shipmentitems_split_filtered";
+		String shipments_folder_filtered = outputFolder + "shipments_split_filtered";
+
+		filterXDocLoadingUnitsByColumns (xdlu_folder_in, xdlu_folder_out, xdlu_columns);		
+		filterConsignmentsByColumns(consignments_folder_in, consignments_folder_filtered, consignment_columns);		
+		filterLoadingUnitsByColumns(loadingUnits_folder_in, loadingUnits_folder_filtered, loadingUnit_columns);		
+		filterWavesByColumns(waves_folder_in, waves_folder_filtered, wave_columns);			
+		filterShipmentItemsByColumns(shipmentItems_folder_in, shipmentItems_folder_filtered, shipmentItems_columns);			
+		filterShipmentsByColumns(shipments_folder_in, shipments_folder_filtered, shipment_columns);			
+
+	}
+	
+
+	private static void filterXDocLoadingUnitsByColumns(String inputFolder, String filteredFolder, List<Integer> columns) {
+		File folder = new File (inputFolder);
+		File[] files = folder.listFiles();
+		
+		for (File f : files) {
+			filterCSVByColumns(f.getPath(), f.getPath().replace(inputFolder, filteredFolder), columns);
+		}
+		
+
+	}
+
+	private static void filterConsignmentsByColumns(String inputFolder, String filteredFolder, List<Integer> columns) {
+		File folder = new File (inputFolder);
+		File[] files = folder.listFiles();
+		
+		for (File f : files) {
+			filterCSVByColumns(f.getPath(), f.getPath().replace(inputFolder, filteredFolder), columns);
+		}
+
+	}
+
+	private static void filterLoadingUnitsByColumns(String inputFolder, String filteredFolder, List<Integer> columns) {
+		File folder = new File (inputFolder);
+		File[] files = folder.listFiles();
+		
+		for (File f : files) {
+			filterCSVByColumns(f.getPath(), f.getPath().replace(inputFolder, filteredFolder), columns);
+		}
+
+	}
+
+	private static void filterWavesByColumns(String inputFolder, String filteredFolder, List<Integer> columns) {
+		File folder = new File (inputFolder);
+		File[] files = folder.listFiles();
+		
+		for (File f : files) {
+			filterCSVByColumns(f.getPath(), f.getPath().replace(inputFolder, filteredFolder), columns);
+		}
+
+	}
+
+	private static void filterShipmentItemsByColumns(String inputFolder, String filteredFolder, List<Integer> columns) {
+		File folder = new File (inputFolder);
+		File[] files = folder.listFiles();
+		
+		for (File f : files) {
+			filterCSVByColumns(f.getPath(), f.getPath().replace(inputFolder, filteredFolder), columns);
+		}
+
+	}
+
+	private static void filterShipmentsByColumns(String inputFolder, String filteredFolder, List<Integer> columns) {
+		File folder = new File (inputFolder);
+		File[] files = folder.listFiles();
+		
+		for (File f : files) {
+			filterCSVByColumns(f.getPath(), f.getPath().replace(inputFolder, filteredFolder), columns);
+		}
+
+	}
+	
+
 
 	public static void filterCSVByColumns(String csvFileIn, String csvFileOut, List<Integer> columns) {
 
@@ -199,7 +477,7 @@ public class CSVProcessor {
 	public static void createFolders(String splitCSVFilesFilteredFolder) throws IOException {
 
 		String[] listOfFolders = {"relevant_loading_unit_ids", "relevant_consignment_ids", "relevant_wave_ids", 
-				"relevant_shipment_ids", "relevant_transport_ids", "xdlu_split_filtered", "consignments_split_filtered",
+				"relevant_shipment_ids", "relevant_transport_ids", "hubreconstructionlocations_split_filtered", "xdlu_split_filtered", "consignments_split_filtered",
 				"loadingunits_split_filtered", "waves_split_filtered", "tradeitems_split_filtered", "dgr_split_filtered",
 				"shipmentitems_split_filtered", "shipments_split_filtered", "transports_split_filtered"};
 
@@ -234,6 +512,8 @@ public class CSVProcessor {
 		String shipmentItems_folder_in = splitCSVFilesFolder + "shipmentitems_split";
 		String shipments_folder_in = splitCSVFilesFolder + "shipments_split";
 		String transports_folder_in = splitCSVFilesFolder + "transports_split";		
+		String hubReconstructionLocations_folder_in = splitCSVFilesFolder + "hubreconstructionlocations_split";
+
 
 		String loadingUnitIdFile = splitCSVFilesFilteredFolder + "relevant_loading_unit_ids/loadingUnitIds.txt"; 
 		String consignmentIdFile = splitCSVFilesFilteredFolder + "relevant_consignment_ids/consignmentIds.txt"; 
@@ -250,8 +530,10 @@ public class CSVProcessor {
 		String shipmentItems_folder_filtered = splitCSVFilesFilteredFolder + "shipmentitems_split_filtered";
 		String shipments_folder_filtered = splitCSVFilesFilteredFolder + "shipments_split_filtered";
 		String transports_folder_filtered = splitCSVFilesFilteredFolder + "transports_split_filtered";
+		String hubReconstructionLocations_folder_filtered = splitCSVFilesFilteredFolder + "hubreconstructionlocations_split_filtered";
 
 		//the following calls need to run in the correct order
+		
 		filterXDocLoadingUnitsOnPeriod (xdlu_folder_in, xdlu_folder_out, startDateTime, endDateTime);		
 		printRelevantConLoadWave (xdlu_folder_out, loadingUnitIdFile, consignmentIdFile, waveIdFile);
 		filterConsignments(consignments_folder_in, consignments_folder_filtered, consignmentIdFile);		
@@ -262,109 +544,13 @@ public class CSVProcessor {
 		printRelevantShipmentIds (shipmentItems_folder_in, loadingUnitIdFile, shipmentIdFile);			
 		filterShipmentItems(shipmentItems_folder_in, shipmentItems_folder_filtered, shipmentIdFile);			
 		filterShipments(shipments_folder_in, shipments_folder_filtered, shipmentIdFile);			
+		filterHubReconstructionLocations(hubReconstructionLocations_folder_in, hubReconstructionLocations_folder_filtered);
 		//printRelevantTransports(consignments_folder_in, consignmentIdFile, transportIdFile);
 		//filterTransports (transports_folder_in, transports_folder_filtered, transportIdFile);
 
 	}
 
-	public static void filterOnColumns(String inputFolder, String outputFolder, List<Integer> xdlu_columns, List<Integer> consignment_columns, List<Integer> shipment_columns,
-			List<Integer> shipmentItems_columns, List<Integer> loadingUnit_columns, List<Integer> wave_columns) throws ParseException, IOException {
-
-		createFolders(outputFolder);
-
-		String xdlu_folder_in = inputFolder + "xdlu_split_filtered";
-		String consignments_folder_in = inputFolder + "consignments_split_filtered";
-		String loadingUnits_folder_in = inputFolder + "loadingunits_split_filtered";
-		String waves_folder_in = inputFolder + "waves_split_filtered";
-		//String tradeItems_folder_in = splitCSVFiles + "tradeitems_split";
-		//String dgr_folder_in = splitCSVFiles + "dgr_split";
-		String shipmentItems_folder_in = inputFolder + "shipmentitems_split_filtered";
-		String shipments_folder_in = inputFolder + "shipments_split_filtered";
-		//String transports_folder_in = splitCSVFiles + "transports_split";		
-
-		String xdlu_folder_out = outputFolder + "xdlu_split_filtered";
-		String consignments_folder_filtered = outputFolder + "consignments_split_filtered";
-		String loadingUnits_folder_filtered = outputFolder + "loadingunits_split_filtered";
-		String waves_folder_filtered = outputFolder + "waves_split_filtered";
-//		String tradeItems_folder_filtered = outputFolder + "tradeitems_split_filtered";
-//		String dgr_folder_filtered = outputFolder + "dgr_split_filtered";
-		String shipmentItems_folder_filtered = outputFolder + "shipmentitems_split_filtered";
-		String shipments_folder_filtered = outputFolder + "shipments_split_filtered";
-//		String transports_folder_filtered = outputFolder + "transports_split_filtered";
-
-		filterXDocLoadingUnitsByColumns (xdlu_folder_in, xdlu_folder_out, xdlu_columns);		
-		filterConsignmentsByColumns(consignments_folder_in, consignments_folder_filtered, consignment_columns);		
-		filterLoadingUnitsByColumns(loadingUnits_folder_in, loadingUnits_folder_filtered, loadingUnit_columns);		
-		filterWavesByColumns(waves_folder_in, waves_folder_filtered, wave_columns);		
-		//filterTradeItems(tradeItems_folder_in, tradeItems_folder_filtered, loadingUnitIdFile);	
-		//filterDangerousGoods(dgr_folder_in, dgr_folder_filtered, loadingUnitIdFile);		
-		filterShipmentItemsByColumns(shipmentItems_folder_in, shipmentItems_folder_filtered, shipmentItems_columns);			
-		filterShipmentsByColumns(shipments_folder_in, shipments_folder_filtered, shipment_columns);			
-		//filterTransports (transports_folder_in, transports_folder_filtered, transportIdFile);
-
-	}
 	
-
-	private static void filterXDocLoadingUnitsByColumns(String inputFolder, String filteredFolder, List<Integer> columns) {
-		File folder = new File (inputFolder);
-		File[] files = folder.listFiles();
-		
-		for (File f : files) {
-			filterCSVByColumns(f.getPath(), f.getPath().replace(inputFolder, filteredFolder), columns);
-		}
-		
-
-	}
-
-	private static void filterConsignmentsByColumns(String inputFolder, String filteredFolder, List<Integer> columns) {
-		File folder = new File (inputFolder);
-		File[] files = folder.listFiles();
-		
-		for (File f : files) {
-			filterCSVByColumns(f.getPath(), f.getPath().replace(inputFolder, filteredFolder), columns);
-		}
-
-	}
-
-	private static void filterLoadingUnitsByColumns(String inputFolder, String filteredFolder, List<Integer> columns) {
-		File folder = new File (inputFolder);
-		File[] files = folder.listFiles();
-		
-		for (File f : files) {
-			filterCSVByColumns(f.getPath(), f.getPath().replace(inputFolder, filteredFolder), columns);
-		}
-
-	}
-
-	private static void filterWavesByColumns(String inputFolder, String filteredFolder, List<Integer> columns) {
-		File folder = new File (inputFolder);
-		File[] files = folder.listFiles();
-		
-		for (File f : files) {
-			filterCSVByColumns(f.getPath(), f.getPath().replace(inputFolder, filteredFolder), columns);
-		}
-
-	}
-
-	private static void filterShipmentItemsByColumns(String inputFolder, String filteredFolder, List<Integer> columns) {
-		File folder = new File (inputFolder);
-		File[] files = folder.listFiles();
-		
-		for (File f : files) {
-			filterCSVByColumns(f.getPath(), f.getPath().replace(inputFolder, filteredFolder), columns);
-		}
-
-	}
-
-	private static void filterShipmentsByColumns(String inputFolder, String filteredFolder, List<Integer> columns) {
-		File folder = new File (inputFolder);
-		File[] files = folder.listFiles();
-		
-		for (File f : files) {
-			filterCSVByColumns(f.getPath(), f.getPath().replace(inputFolder, filteredFolder), columns);
-		}
-
-	}
 
 	public static void filterOnHub(int csvFieldNumber, String hub) throws ParseException {
 
@@ -377,6 +563,7 @@ public class CSVProcessor {
 		String shipmentItems_folder_in = "./files/CSV/Audun/_ORIGINAL_CSV/shipmentitems_split";
 		String shipments_folder_in = "./files/CSV/Audun/_ORIGINAL_CSV/shipments_split";
 		String transports_folder_in = "./files/CSV/Audun/_ORIGINAL_CSV/transports_split";
+		String hubReconstructionLocations_folder_in = "./files/CSV/Audun/_ORIGINAL_CSV/hubreconstructionlocations_split";
 
 		String xdlu_folder_out = "./files/CSV/Audun/_FILTER_HUB/xdlu_split_filtered";
 		String loadingUnitIdFile = "./files/CSV/Audun/_FILTER_HUB/relevant_loading_unit_ids/loadingUnitIds.txt"; 
@@ -392,10 +579,11 @@ public class CSVProcessor {
 		String shipmentItems_folder_filtered = "./files/CSV/Audun/_FILTER_HUB/shipmentitems_split_filtered";
 		String shipments_folder_filtered = "./files/CSV/Audun/_FILTER_HUB/shipments_split_filtered";
 		String transports_folder_filtered = "./files/CSV/Audun/_FILTER_HUB/transports_split_filtered";
+		String hubReconstructionLocations_folder_filtered = "./files/CSV/Audun/_ORIGINAL_CSV/hubreconstructionlocations_split_filtered";
 
 		filterXDocLoadingUnitsOnHub(csvFieldNumber, hub, xdlu_folder_in, xdlu_folder_out);
-
 		printRelevantConLoadWave (xdlu_folder_out, loadingUnitIdFile, consignmentIdFile, waveIdFile);
+		filterHubReconstructionLocations(hubReconstructionLocations_folder_in, hubReconstructionLocations_folder_filtered);
 		filterConsignments(consignments_folder_in, consignments_folder_filtered, consignmentIdFile);		
 		filterLoadingUnits(loadingUnits_folder_in, loadingUnits_folder_filtered, loadingUnitIdFile);		
 		filterWaves(waves_folder_in, waves_folder_filtered, waveIdFile);		
@@ -460,7 +648,6 @@ public class CSVProcessor {
 					params = line.split(",");
 
 					if (transportIds.contains(params[0])) {
-
 						bw.write(line);
 						bw.newLine();
 
@@ -536,7 +723,6 @@ public class CSVProcessor {
 					params = line.split(",");
 
 					if (shipmentItemIds.contains(params[0])) {
-
 						bw.write(line);
 						bw.newLine();
 
@@ -903,6 +1089,7 @@ public class CSVProcessor {
 			}
 			try {
 				bw = new BufferedWriter(new FileWriter(filteredFolder + "/" + filesInDir[i].getName() + "_filtered"));
+				System.out.println("filterWaves: printing to " + filteredFolder + "/" + filesInDir[i].getName() + "_filtered");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -918,6 +1105,64 @@ public class CSVProcessor {
 						bw.newLine();
 
 					}
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			try {
+				br.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			try {
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+		}
+
+	}
+	
+	
+	private static void filterHubReconstructionLocations (String inputFolder, String filteredFolder) throws ParseException {
+
+		BufferedReader br = null;
+
+		String id = null;
+
+		File splitFolder = new File(inputFolder);
+
+		File[] filesInDir = splitFolder.listFiles();
+
+		BufferedWriter bw = null;
+
+		for (int i = 0; i < filesInDir.length; i++) {
+
+			String line;		
+
+			try {
+				br = new BufferedReader(new FileReader(filesInDir[i]));
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+			try {
+				
+				System.out.println("filterHubReconstructionLocations: Reading file: " + filesInDir[i].getName());
+				System.out.println("filterHubReconstructionLocations: Trying to print file:" + filteredFolder + "/" + filesInDir[i].getName() + "_filtered");
+				
+				bw = new BufferedWriter(new FileWriter(filteredFolder + "/" + filesInDir[i].getName() + "_filtered"));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			//for hubs we do not perform any filtering, all hubs are included
+			try {
+				while ((line = br.readLine()) != null) {
+
+						bw.write(line);
+						bw.newLine();
+
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -1012,6 +1257,129 @@ public class CSVProcessor {
 		}
 
 	}
+	
+	private static void filterXDocLoadingUnitsOnPeriod (String inputFolder, String filteredFolder, String startDateTime, String endDateTime) throws ParseException {
+
+		File splitFolder = new File(inputFolder);
+
+		File[] filesInDir = splitFolder.listFiles();
+
+		String[] params = null;
+		BufferedReader br = null;
+		BufferedWriter bw = null;
+
+		for (int i = 0; i < filesInDir.length; i++) {
+
+			String line;		
+
+			//System.out.println("Filtering file: " + filesInDir[i].getPath());
+
+			try {
+				br = new BufferedReader(new FileReader(filesInDir[i]));
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+			try {
+				bw = new BufferedWriter(new FileWriter(filteredFolder + "/" + filesInDir[i].getName() + "_filtered"));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			try {
+				while ((line = br.readLine()) != null) {
+
+					params = line.split(",");
+
+
+					if (!params[8].equals("NULL") && withinPeriod(params[8], startDateTime, endDateTime)) {
+
+						bw.write(line);
+						bw.newLine();
+
+
+					}
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+			try {
+				br.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			try {
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+		}
+
+	}
+
+	private static void filterXDocLoadingUnitsOnHub (int csvFieldNumber, String hub, String inputFolder, String filteredFolder) throws ParseException {
+
+		//FIXME: Probably a more elegant way of creating a folder if it doesn´t exist
+		File outputFolder = new File(filteredFolder);
+
+		if (!outputFolder.exists()) {
+			outputFolder.mkdir();
+		}
+
+		File splitFolder = new File(inputFolder);
+
+		File[] filesInDir = splitFolder.listFiles();
+
+		String[] params = null;
+		BufferedReader br = null;
+		BufferedWriter bw = null;
+
+		for (int i = 0; i < filesInDir.length; i++) {
+
+			String line;		
+
+			try {
+				br = new BufferedReader(new FileReader(filesInDir[i]));
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+			try {
+				bw = new BufferedWriter(new FileWriter(filteredFolder + "/" + filesInDir[i].getName() + "_filtered"));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			try {
+				while ((line = br.readLine()) != null) {
+
+					params = line.split(",");
+
+					if (params[csvFieldNumber].equals (hub)) {
+
+						bw.write(line);
+						bw.newLine();
+					}
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			} 
+			try {
+				br.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			try {
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+		}
+
+	}
+	
 	/**
 	 * Prints the shipment ids relevant for a given filtered period to file as to subset the entire dataset. 
 	 * @param inputFolder
@@ -1021,8 +1389,6 @@ public class CSVProcessor {
 	 */
 	private static void printRelevantShipmentIds (String inputFolder, String filterPath, String shipmentIdsFile) {
 		
-		System.out.println("inputFolder: " + inputFolder + ", filterPath: " + filterPath);
-
 		Set<String> shipmentIds = new HashSet<String>();
 
 		File splitFolder = new File(inputFolder);
@@ -1051,8 +1417,6 @@ public class CSVProcessor {
 			e.printStackTrace();
 		}
 		
-		System.out.println("number of entries in loadingUnitIds: " + loadingUnitIds.size());
-
 		List<String[]> line = new ArrayList<String[]>();
 
 		for (int i = 0; i < filesInDir.length; i++) {
@@ -1082,7 +1446,7 @@ public class CSVProcessor {
 				e.printStackTrace();
 			}
 			
-			System.out.println("There are " + shipmentIds.size() + " relevant shipment ids");
+			//System.out.println("There are " + shipmentIds.size() + " relevant shipment ids");
 
 
 		}
@@ -1344,128 +1708,7 @@ public class CSVProcessor {
 
 	}
 
-	private static void filterXDocLoadingUnitsOnPeriod (String inputFolder, String filteredFolder, String startDateTime, String endDateTime) throws ParseException {
-
-		File splitFolder = new File(inputFolder);
-
-		File[] filesInDir = splitFolder.listFiles();
-
-		String[] params = null;
-		BufferedReader br = null;
-		BufferedWriter bw = null;
-
-		for (int i = 0; i < filesInDir.length; i++) {
-
-			String line;		
-
-			//System.out.println("Filtering file: " + filesInDir[i].getPath());
-
-			try {
-				br = new BufferedReader(new FileReader(filesInDir[i]));
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
-			try {
-				bw = new BufferedWriter(new FileWriter(filteredFolder + "/" + filesInDir[i].getName() + "_filtered"));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-			try {
-				while ((line = br.readLine()) != null) {
-
-					params = line.split(",");
-
-
-					if (!params[8].equals("NULL") && withinPeriod(params[8], startDateTime, endDateTime)) {
-
-						bw.write(line);
-						bw.newLine();
-
-
-					}
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}
-			try {
-				br.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			try {
-				bw.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-		}
-
-	}
-
-	private static void filterXDocLoadingUnitsOnHub (int csvFieldNumber, String hub, String inputFolder, String filteredFolder) throws ParseException {
-
-		//FIXME: Probably a more elegant way of creating a folder if it doesn´t exist
-		File outputFolder = new File(filteredFolder);
-
-		if (!outputFolder.exists()) {
-			outputFolder.mkdir();
-		}
-
-		File splitFolder = new File(inputFolder);
-
-		File[] filesInDir = splitFolder.listFiles();
-
-		String[] params = null;
-		BufferedReader br = null;
-		BufferedWriter bw = null;
-
-		for (int i = 0; i < filesInDir.length; i++) {
-
-			String line;		
-
-			try {
-				br = new BufferedReader(new FileReader(filesInDir[i]));
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
-			try {
-				bw = new BufferedWriter(new FileWriter(filteredFolder + "/" + filesInDir[i].getName() + "_filtered"));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-			try {
-				while ((line = br.readLine()) != null) {
-
-					params = line.split(",");
-
-
-					if (params[csvFieldNumber].equals (hub)) {
-
-						bw.write(line);
-						bw.newLine();
-					}
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			} 
-			try {
-				br.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			try {
-				bw.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-		}
-
-	}
+	
 
 
 	private static List<String[]> oneByOne(Reader reader) throws Exception {
@@ -1492,7 +1735,7 @@ public class CSVProcessor {
 
 
 	private static boolean withinPeriod (String input, String start, String end) throws ParseException {
-
+		
 		boolean withinPeriod = false;
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");

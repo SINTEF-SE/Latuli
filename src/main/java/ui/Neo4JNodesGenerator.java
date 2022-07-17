@@ -1,11 +1,6 @@
 package ui;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -14,82 +9,54 @@ import java.nio.file.Path;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
 
 import com.google.common.base.Stopwatch;
-import com.opencsv.CSVWriter;
 
 import csvfiltering.CSVProcessor;
-import utilities.StringUtilities;
+import datavalidation.Validation;
 
-public class Neo4JDatasetGenerator {
+public class Neo4JNodesGenerator {
 
 	//test method
 	public static void main(String[] args) throws IOException {
 
 
 		Stopwatch stopwatch = Stopwatch.createStarted();
-//		Scanner input = new Scanner(System.in);
-//
-//		System.out.println("Enter start datetime (yyyy-MM-dd'T'HH:mm:ss): "); 
-//		String startDateTime = input.nextLine();
-//
-//		System.out.println("\nEnter end datetime (yyyy-MM-dd'T'HH:mm:ss): "); 
-//		String endDateTime = input.nextLine();
-//
-//		System.out.println("\nEnter existing source folder for CSV files: "); 
-//		String csvSource = input.nextLine();
-//
-//		System.out.println("\nDo your CSV files contain a header (Y or N)?: "); 
-//		String header = input.nextLine();
-//
-//		if (header.equalsIgnoreCase("Y")) {
-//			try {
-//				System.out.println("Removing the header from all CSV files...");
-//				CSVProcessor.removeFirstLineFromFilesInFolder(csvSource);
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//
-//		System.out.println("\nEnter name of new folder where the generated CSV files will be stored");
-//		String csvOutput = input.nextLine();
-//
-//		input.close(); 
 		
 		List<Integer> xDocLoadingUnitColumns = new LinkedList<Integer>(Arrays.asList(0,1,2,3,5,6,7,11,12,18,36,37,40,41,42));
 		List<Integer> consignmentColumns = new LinkedList<Integer>(Arrays.asList(0,18,23,32,33,34,35,36,40,41));
-		List<Integer> shipmentColumns = new LinkedList<Integer>(Arrays.asList(0,3,4,18,19));
-		List<Integer> shipmentItemsColumns = new LinkedList<Integer>(Arrays.asList(0,1,2,4));
+		List<Integer> shipmentColumns = new LinkedList<Integer>(Arrays.asList(0,3,18,19));
+		List<Integer> shipmentItemsColumns = new LinkedList<Integer>(Arrays.asList(0,1,2,3,4));
 		List<Integer> loadingUnitColumns = new LinkedList<Integer>(Arrays.asList(0,1,2,3));
-		List<Integer> hubReconstructionLocationColumns = new LinkedList<Integer>(Arrays.asList(0,1,2));
-		List<Integer> waveColumns = new LinkedList<Integer>(Arrays.asList(0,1,2,3,4,8,9,10,11,12,13,14,15,16,17,18,19,20,21));
+		List<Integer> waveColumns = new LinkedList<Integer>(Arrays.asList(0,1,2,4,8,9,10,12,13,14,15,16,17,18,19,20,21));
 		
-		String startDateTime = "2019-12-01T10:00:00";
-		String endDateTime = "2020-05-01T10:00:00";
-		String csvSource = "./files/DATASETS/2019_2022";
+		String startDateTime = "2021-01-01T10:00:00";
+		String endDateTime = "2022-05-01T10:00:00";
+		String csvSource = "./files/DATASETS/2020_2022";
 		//if there are headers in the csv files
-		//System.out.println("Removing headers...");
-		//CSVProcessor.removeFirstLineFromFilesInFolder(csvSource);
-		String csvOutput = "./files/DATASETS/FilteredByColumns";
+		System.out.println("Removing headers...");
+		CSVProcessor.removeFirstLineFromFilesInFolder(csvSource);
+		String csvOutput = "./files/DATASETS/2020_2022_FilteredByColumns";
 
 		System.out.println("\nThis process may take several minutes to complete...");	  
 
 		String tmpSplitFiles = "tmpSplitFiles/";
 		String tmpSplitFilesFiltered = "tmpSplitFilesFiltered/";
 		String tmpSplitFilesByColumn = "tmpSplitFilesByColumn/";
+		String tmpCorrectedDates = "tmpCorrectedDates/";
 
 		int chunkSize = 50;
 
 		File tmpSplitFilesFolder = new File(tmpSplitFiles);
 		File tmpSplitFilesFilteredFolder = new File (tmpSplitFilesFiltered);
 		File tmpSplitFilesColumn = new File (tmpSplitFilesByColumn);
+		File tmpCorrectedDatesFolder = new File (tmpCorrectedDates);
+		
 		File csvSourceFolder = new File (csvSource);
 		File csvOutputFolder = new File (csvOutput);
 
@@ -101,7 +68,9 @@ public class Neo4JDatasetGenerator {
 			tmpSplitFilesFilteredFolder.mkdir();
 		} if (!tmpSplitFilesColumn.exists()) {
 			tmpSplitFilesColumn.mkdir();
-		}if (!csvOutputFolder.exists()) {
+		} if (!tmpCorrectedDatesFolder.exists()) {
+			tmpCorrectedDatesFolder.mkdir();
+		} if (!csvOutputFolder.exists()) {
 			csvOutputFolder.mkdir();
 		} 
 
@@ -114,7 +83,7 @@ public class Neo4JDatasetGenerator {
 		}
 
 		for (File file : list) {
-			System.out.println("Splitting file " + file.getName() + " (" + file.length() / (1024 * 1024) + " MB) into chunks of max size " + chunkSize + " MB");
+			System.out.println("Splitting file " + file.getName() + " (" + file.length() / (1024 * 1024) + " MB) into chunks of max size " + chunkSize + " MB...");
 			try {
 				CSVProcessor.splitCSV(file.getPath(), tmpSplitFiles, chunkSize);
 			} catch (IOException e) {
@@ -132,7 +101,7 @@ public class Neo4JDatasetGenerator {
 		}
 		
 		//filter on columns
-		System.out.println("Filtering on columns");
+		System.out.println("Filtering on columns...");
 		try {
 			CSVProcessor.filterOnColumns(tmpSplitFilesFiltered, tmpSplitFilesByColumn, xDocLoadingUnitColumns, consignmentColumns, 
 					shipmentColumns, shipmentItemsColumns, loadingUnitColumns, waveColumns);
@@ -141,9 +110,13 @@ public class Neo4JDatasetGenerator {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
+		
+		//correct datetime format
+		System.out.println("Correcting datetime format...");
+		CSVProcessor.formatDates(tmpSplitFilesByColumn, tmpCorrectedDates);
 
-		System.out.println("Creating Neo4J dataset");
-		createNeo4JDataset(tmpSplitFilesByColumn, csvOutput);
+		System.out.println("Creating Neo4J dataset...");
+		createNeo4JDataset(tmpCorrectedDates, csvOutput);
 
 
 		//remove tmp folders after CSV file generation
@@ -165,7 +138,33 @@ public class Neo4JDatasetGenerator {
 			e.printStackTrace();
 		}
 		
-
+		try {
+			deleteFolder(tmpCorrectedDatesFolder.toPath());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		System.out.println("Validating complete CSV files...");
+		String inputConsignmentCSV = csvOutput + "/consignments.csv";
+		String inputShipmentsCSV = csvOutput + "/shipments.csv";
+		String inputShipmentItemsCSV = csvOutput + "/shipmentitems.csv";
+		String inputLoadingUnitsCSV = csvOutput + "/loadingunits.csv";
+		String inputXDocLoadingUnitsCSV = csvOutput + "/xdlu.csv";
+		String inputWavesCSV = csvOutput + "/waves.csv";
+		
+		String outputConsignmentCSV = csvOutput + "/consignments_validated.csv";
+		String outputShipmentsCSV = csvOutput + "/shipments_validated.csv";
+		String outputShipmentItemsCSV = csvOutput + "/shipmentitems_validated.csv";
+		String outputLoadingUnitsCSV = csvOutput + "/loadingunits_validated.csv";
+		String outputXDocLoadingUnitsCSV = csvOutput + "/xdlu_validated.csv";
+		String outputWavesCSV = csvOutput + "/waves_validated.csv";
+		
+		Validation.validateConsignments(inputConsignmentCSV, outputConsignmentCSV);
+		Validation.validateShipments(inputShipmentsCSV, outputShipmentsCSV);	
+		Validation.validateShipmentItems(inputShipmentItemsCSV, outputShipmentItemsCSV);	
+		Validation.validateLoadingUnits(inputLoadingUnitsCSV, outputLoadingUnitsCSV);	
+		Validation.validateXDocLoadingUnits(inputXDocLoadingUnitsCSV, outputXDocLoadingUnitsCSV);
+		Validation.validateWaves(inputWavesCSV, outputWavesCSV);		
 
 		stopwatch.stop();
 
@@ -185,8 +184,10 @@ public class Neo4JDatasetGenerator {
 			System.out.println("Checking file: " + f.getPath());
 			if (f.listFiles().length <= 1 && !f.getName().endsWith("_ids")) {
 				File[] singleFiles = f.listFiles();
+				//if only one file, have the name of the file be filename until '_'
 				for (File sf : singleFiles) {
-					FileUtils.copyFile(sf, new File(joinedCSVOutputFolder + "/" + sf.getName() + ".csv"));
+					FileUtils.copyFile(sf, new File(joinedCSVOutputFolder + "/" + sf.getName().substring(0, sf.getName().indexOf("_")) + ".csv"));
+//					FileUtils.copyFile(sf, new File(joinedCSVOutputFolder + "/" + sf.getName() + ".csv"));
 				}
 			} else if (!f.getName().endsWith("_ids")) {
 				System.out.println("Processing folder " + f.getName() + " with number of files: " + f.listFiles().length);

@@ -148,12 +148,13 @@ public class KGUtilities {
 	 */
 	public static String createObjectProperty(String entity, String baseURI, String objectProperty, String value, String typeSuffix, String tripleClosure) {
 
-		return baseURI + entity + " " + baseURI + objectProperty + "> " + " " + baseURI + value + typeSuffix + tripleClosure;
+		return baseURI + entity + " " + baseURI + objectProperty + ">" + " " + baseURI + value + typeSuffix + tripleClosure;
+
 	}
 
 	public static String createDataProperty(String entity, String baseURI, String dataProperty, String value, String dataType, String tripleClosure) {
 
-		return baseURI + entity + " " + baseURI + dataProperty + "> " + " " + "\"" + value + "\"" + dataType + tripleClosure;
+		return baseURI + entity + " " + baseURI + dataProperty + ">" + " " + "\"" + value + "\"" + dataType + tripleClosure;
 	}
 
 	public static String createGeoDataProperty(String entity, String baseURI, String geoSparqlDataProperty, String value, String geoSparqlTripleClosure) {

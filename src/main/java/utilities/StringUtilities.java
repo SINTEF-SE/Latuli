@@ -97,6 +97,20 @@ public class StringUtilities {
 		return dateTime;
 
 	}
+	
+	public static String convertToShortenedDateTime(String input) {	
+
+		if (input.equals("NULL") || input.length() != 27 || !input.startsWith("20")) {
+			input = "0000-00-00 00:00:00.0000000";
+		}
+
+		String dateTime = input.substring(0, input.lastIndexOf(":"));
+
+		dateTime = dateTime.replaceAll(" ", "T");
+
+		return dateTime;
+
+	}
 
 	public static Integer convertToEpoch(String timestamp){
 
