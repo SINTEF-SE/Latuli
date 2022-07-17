@@ -1,4 +1,4 @@
-package ui;
+package ui.rdf2vec;
 
 import java.io.File;
 import java.io.IOException;

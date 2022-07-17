@@ -1,4 +1,4 @@
-package ui;
+package ui.neo4j.completegraph;
 
 import java.io.File;
 import java.io.IOException;

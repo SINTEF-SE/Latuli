@@ -1,4 +1,4 @@
-package dataaggregation;
+package ui.neo4j.hubcentric;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class HubCentric {
+public class HubCentricNeo4JGraphGenerator {
 
 	public static void main(String[] args) throws IOException, ParseException {
 
