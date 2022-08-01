@@ -18,18 +18,29 @@ public class HubCentricNeo4JGraphGenerator {
 
 	public static void main(String[] args) throws IOException, ParseException {
 
-		String waves = "./files/DATASETS/HubCentric/waves.csv";
-		String xdlu = "./files/DATASETS/HubCentric/xdlu.csv";
-		String max = "./files/DATASETS/HubCentric/max.csv";
+		String maxFile = "./files/DATASETS/HubCentric/max.csv";
+		String wavesFile = "./files/DATASETS/HubCentric/waves.csv";
+		String xdluFile = "./files/DATASETS/HubCentric/xdlu.csv";
+		
+		String trainingFromDate = "2020-01-01";
+		String trainingToDate = "2021-12-31";
+		String testFromDate = "2022-01-01";
+		String testToDate = "2022-05-01";
+		
+		createKnowledgeGraph(maxFile, wavesFile, xdluFile, trainingFromDate, trainingToDate, testFromDate, testToDate);
+
+	}
+
+	public static void createKnowledgeGraph (String maxFile, String wavesFile, String xdluFile, String trainingFrom, String trainingTo, String testFrom, String testTo) throws ParseException, IOException {
 
 		//get data from waves
-		List<HubData> wavesHubDataList = aggregateWaveData(waves);
+		List<HubData> wavesHubDataList = aggregateWaveData(wavesFile);
 
 		//get data from xdlus
-		List<HubData> xdluHubDataList = aggregateXDLUData(xdlu);
+		List<HubData> xdluHubDataList = aggregateXDLUData(xdluFile);
 
 		//get max data
-		List<HubData> maxList = aggregateMaxData(max);
+		List<HubData> maxList = aggregateMaxData(maxFile);
 
 		//iterate all three lists and create a common list
 		List<HubData> commonList = createCommonList(wavesHubDataList, xdluHubDataList, maxList);
@@ -44,8 +55,7 @@ public class HubCentricNeo4JGraphGenerator {
 		String hasCapacityPrediction_csv = "./files/DATASETS/HubCentric/Relationships/hasCapacityPrediction.csv";
 
 
-		BufferedWriter hub_br = null;
-		
+		BufferedWriter hub_br = null;		
 		BufferedWriter hasThroughput_br = null;
 		BufferedWriter hasCapacityPrediction_br = null;
 
@@ -54,13 +64,13 @@ public class HubCentricNeo4JGraphGenerator {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		try {
 			hasThroughput_br = new BufferedWriter(new FileWriter(hasThroughput_csv));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		try {
 			hasCapacityPrediction_br = new BufferedWriter(new FileWriter(hasCapacityPrediction_csv));
 		} catch (IOException e) {
@@ -69,39 +79,65 @@ public class HubCentricNeo4JGraphGenerator {
 
 
 		Date currentDate = null;
-		Date dateFrom = new SimpleDateFormat("yyyy-MM-dd").parse("2020-01-01");
-		Date dateTo = new SimpleDateFormat("yyyy-MM-dd").parse("2021-12-31");
+		Date trainingDateFrom = new SimpleDateFormat("yyyy-MM-dd").parse(trainingFrom);
+		Date trainingDateTo = new SimpleDateFormat("yyyy-MM-dd").parse(trainingTo);
+		Date testDateFrom = new SimpleDateFormat("yyyy-MM-dd").parse(testFrom);
+		Date testDateTo = new SimpleDateFormat("yyyy-MM-dd").parse(testTo);
 
 		for (HubData hd : completeList) {
 
 			currentDate = new SimpleDateFormat("yyyy-MM-dd").parse(hd.getDate());
 
-
-			if (currentDate.after(dateFrom) && currentDate.before(dateTo)) {
+			if (currentDate.after(testDateFrom) && currentDate.before(testDateTo)) {
 
 				hub_br.write(hd.getHubId() + "," + hd.getHub() + "," + hd.getDate() + "," + hd.getRelativeToMaxCapacity() + "," + "Hub");
 				hub_br.newLine();
-				
+
 				//shipments throughput
 				hasThroughput_br.write(hd.getHubId() + "," + hd.getShipmentsThroughputMeasurement() + "," + "hasThroughput");
 				hasThroughput_br.newLine();
-				
+
 				//volume throughput
 				hasThroughput_br.write(hd.getHubId() + "," + hd.getVolumeThroughputMeasurement() + "," + "hasThroughput");
 				hasThroughput_br.newLine();
-				
+
 				//weight throughput
 				hasThroughput_br.write(hd.getHubId() + "," + hd.getWeightThroughputMeasurement() + "," + "hasThroughput");
 				hasThroughput_br.newLine();
-				
+
 				//pallets throughput
 				hasThroughput_br.write(hd.getHubId() + "," + hd.getPalletsThroughputMeasurement() + "," + "hasThroughput");
 				hasThroughput_br.newLine();
-				
+
 				//boxes throughput
 				hasThroughput_br.write(hd.getHubId() + "," + hd.getBoxesThroughputMeasurement() + "," + "hasThroughput");
 				hasThroughput_br.newLine();
-				
+
+			} else if (currentDate.after(trainingDateFrom) && currentDate.before(trainingDateTo)) {
+
+				hub_br.write(hd.getHubId() + "," + hd.getHub() + "," + hd.getDate() + "," + hd.getRelativeToMaxCapacity() + "," + "Hub");
+				hub_br.newLine();
+
+				//shipments throughput
+				hasThroughput_br.write(hd.getHubId() + "," + hd.getShipmentsThroughputMeasurement() + "," + "hasThroughput");
+				hasThroughput_br.newLine();
+
+				//volume throughput
+				hasThroughput_br.write(hd.getHubId() + "," + hd.getVolumeThroughputMeasurement() + "," + "hasThroughput");
+				hasThroughput_br.newLine();
+
+				//weight throughput
+				hasThroughput_br.write(hd.getHubId() + "," + hd.getWeightThroughputMeasurement() + "," + "hasThroughput");
+				hasThroughput_br.newLine();
+
+				//pallets throughput
+				hasThroughput_br.write(hd.getHubId() + "," + hd.getPalletsThroughputMeasurement() + "," + "hasThroughput");
+				hasThroughput_br.newLine();
+
+				//boxes throughput
+				hasThroughput_br.write(hd.getHubId() + "," + hd.getBoxesThroughputMeasurement() + "," + "hasThroughput");
+				hasThroughput_br.newLine();
+
 				//write capacity prediction
 				hasCapacityPrediction_br.write(hd.getHubId() + "," + hd.getCapacityPrediction() + "," + "hasCapacityPrediction");
 				hasCapacityPrediction_br.newLine();				
@@ -109,7 +145,7 @@ public class HubCentricNeo4JGraphGenerator {
 			}
 
 		}
-		
+
 
 		try {
 			hub_br.close();
@@ -130,9 +166,9 @@ public class HubCentricNeo4JGraphGenerator {
 		}
 
 	}
-	
 
-	public static List<HubData> aggregateWaveData (String waves) {
+
+	private static List<HubData> aggregateWaveData (String waves) {
 
 		//get data from waves
 		List<HubData> wavesHubDataList = new ArrayList<HubData>();
@@ -195,7 +231,7 @@ public class HubCentricNeo4JGraphGenerator {
 
 	}
 
-	public static List<HubData> aggregateXDLUData (String xdlu) {
+	private static List<HubData> aggregateXDLUData (String xdlu) {
 
 		//get data from xdlu
 		List<HubData> xdluHubDataList = new ArrayList<HubData>();
@@ -254,7 +290,7 @@ public class HubCentricNeo4JGraphGenerator {
 		return xdluHubDataList;
 	}
 
-	public static List<HubData> aggregateMaxData (String max) {
+	private static List<HubData> aggregateMaxData (String max) {
 
 		//get max data
 		List<HubData> maxList = new ArrayList<HubData>();
@@ -315,7 +351,7 @@ public class HubCentricNeo4JGraphGenerator {
 
 	}
 
-	public static List<HubData> createCommonList (List<HubData> wavesHubDataList, List<HubData> xdluHubDataList, List<HubData> maxList) {
+	private static List<HubData> createCommonList (List<HubData> wavesHubDataList, List<HubData> xdluHubDataList, List<HubData> maxList) {
 
 		//iterate all three lists and create a common list
 		List<HubData> commonList = new ArrayList<HubData>();
@@ -355,7 +391,7 @@ public class HubCentricNeo4JGraphGenerator {
 
 	}
 
-	public static List<HubData> computeRelativeToMaxCapacity (List<HubData> hubDataList, double CP_THRESHOLD) {
+	private static List<HubData> computeRelativeToMaxCapacity (List<HubData> hubDataList, double CP_THRESHOLD) {
 
 		List<HubData> revisedHubDataList = new ArrayList<HubData>();
 
@@ -364,7 +400,7 @@ public class HubCentricNeo4JGraphGenerator {
 		double relativeMaxShipment = 0;
 		double relativeMaxVolume = 0;
 		double relativeMaxWeight = 0;
-		
+
 		String shipmentsThroughput = null;
 		String weightThroughput = null;
 		String volumeThroughput = null;
@@ -407,20 +443,20 @@ public class HubCentricNeo4JGraphGenerator {
 			} else {
 				highCP = false;
 			}
-			
+
 			shipmentsThroughput = computeShipmentsThroughputMeasurement(hd.getMaxShipments(), hd.getQttShipments(), CP_THRESHOLD);
 			weightThroughput = computeWeightThroughputMeasurement(hd.getMaxWeight(), hd.getTotalWeight(), CP_THRESHOLD);
 			volumeThroughput = computeVolumeThroughputMeasurement(hd.getMaxVolume(), hd.getTotalVolume(), CP_THRESHOLD);
 			palletsThroughput = computePalletsThroughputMeasurement(hd.getMaxPallets(), hd.getQttPalletsBuilt(), CP_THRESHOLD);
 			boxesThroughput = computeBoxesThroughputMeasurement(hd.getMaxBoxes(), hd.getQttBoxesProcessed(), CP_THRESHOLD);
-			
+
 			if (highCP) {
 				capacityPrediction = "HighCapacityPrediction";
 			} else {
 				capacityPrediction = "LowCapacityPrediction";
 			}
-			
-			
+
+
 
 			revisedHubData = new HubData.HubDataBuilder()
 					.setHubId(hd.getHubId())
@@ -557,7 +593,7 @@ public class HubCentricNeo4JGraphGenerator {
 		private String palletsThroughputMeasurement;
 		private String boxesThroughputMeasurement;
 		private String capacityPrediction;
-		
+
 
 		private HubData(HubDataBuilder builder) {
 			this.hubId = builder.hubId;
@@ -667,12 +703,12 @@ public class HubCentricNeo4JGraphGenerator {
 				this.maxWeight = maxWeight;
 				return this;
 			}
-			
+
 			public HubDataBuilder setMaxPallets(int maxPallets) {
 				this.maxPallets = maxPallets;
 				return this;
 			}
-			
+
 			public HubDataBuilder setMaxBoxes(int maxBoxes) {
 				this.maxBoxes = maxBoxes;
 				return this;
@@ -707,7 +743,7 @@ public class HubCentricNeo4JGraphGenerator {
 				this.boxesThroughputMeasurement = boxesThroughputMeasurement;
 				return this;
 			}
-			
+
 			public HubDataBuilder setCapacityPrediction(String capacityPrediction) {
 				this.capacityPrediction = capacityPrediction;
 				return this;
@@ -765,11 +801,11 @@ public class HubCentricNeo4JGraphGenerator {
 		public double getMaxWeight() {
 			return maxWeight;
 		}
-		
+
 		public int getMaxPallets() {
 			return maxPallets;
 		}
-		
+
 		public int getMaxBoxes() {
 			return maxBoxes;
 		}
@@ -797,7 +833,7 @@ public class HubCentricNeo4JGraphGenerator {
 		public String getBoxesThroughputMeasurement() {
 			return boxesThroughputMeasurement;
 		}
-		
+
 		public String getCapacityPrediction() {
 			return capacityPrediction;
 		}
