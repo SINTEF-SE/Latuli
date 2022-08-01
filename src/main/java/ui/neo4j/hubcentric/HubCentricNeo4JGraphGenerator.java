@@ -6,7 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -16,98 +15,7 @@ import java.util.List;
 public class HubCentricNeo4JGraphGenerator {
 
 	final static double CP_THRESHOLD = 0.75;
-	
-	private static double round (double value, int precision) { 
-	    int scale = (int) Math.pow(10, precision); 
-	    return (double) Math.round(value * scale) / scale; 
-	} 
-	
-	private static String computeDailyWeightRatio (double max, double daily) {
-		
-		//round to 2 decimals
-		double ratio = round((daily / max), 2);
-		String dailyWeightRatio = null;
-		
-		if (ratio <= 0.33) {
-			dailyWeightRatio = "LowDailyWeightRatio";
-		} else if (ratio >= 0.34 && ratio <= 0.66) {
-			dailyWeightRatio = "MediumDailyWeightRatio";
-		} else {
-			dailyWeightRatio = "HighDailyWeightRatio";
-		}
-		
-		return dailyWeightRatio;
-	}
-	
-	private static String computeDailyVolumeRatio (double max, double daily) {
-		
-		//round to 2 decimals
-		double ratio = round((daily / max), 2);
-		String dailyVolumeRatio = null;
-		
-		if (ratio <= 0.33) {
-			dailyVolumeRatio = "LowDailyVolumeRatio";
-		} else if (ratio >= 0.34 && ratio <= 0.66) {
-			dailyVolumeRatio = "MediumDailyVolumeRatio";
-		} else {
-			dailyVolumeRatio = "HighDailyVolumeRatio";
-		}
-		
-		return dailyVolumeRatio;
-	}
-	
-	private static String computeDailyShipmentsRatio (int max, int daily) {
-		
-		//round to 2 decimals
-		double ratio = round(((double)daily / (double)max), 2);
-		String dailyShipmentsRatio = null;
-		
-		if (ratio <= 0.33) {
-			dailyShipmentsRatio = "LowDailyShipmentsRatio";
-		} else if (ratio >= 0.34 && ratio <= 0.66) {
-			dailyShipmentsRatio = "MediumDailyShipmentsRatio";
-		} else {
-			dailyShipmentsRatio = "HighDailyShipmentsRatio";
-		}
-		
-		return dailyShipmentsRatio;
-	}
-	
-	private static String computeDailyPalletsBuiltRatio (int max, int daily) {
-		
-		//round to 2 decimals
-		double ratio = round(((double)daily / (double)max), 2);
-		String dailyPalletsBuiltRatio = null;
-		
-		if (ratio <= 0.33) {
-			dailyPalletsBuiltRatio = "LowDailyPalletsBuiltRatio";
-		} else if (ratio >= 0.34 && ratio <= 0.66) {
-			dailyPalletsBuiltRatio = "MediumDailyPalletsBuiltRatio";
-		} else {
-			dailyPalletsBuiltRatio = "HighDailyPalletsBuiltRatio";
-		}
-		
-		return dailyPalletsBuiltRatio;
-	}
-	
-	private static String computeDailyBoxesProcessedRatio (int max, int daily) {
-		
-		//round to 2 decimals
-		double ratio = round(((double)daily / (double)max), 2);
-		String dailyBoxesProcessedRatio = null;
-		
-		if (ratio <= 0.33) {
-			dailyBoxesProcessedRatio = "LowDailyBoxesProcessedRatio";
-		} else if (ratio >= 0.34 && ratio <= 0.66) {
-			dailyBoxesProcessedRatio = "MediumDailyBoxesProcessedRatio";
-		} else {
-			dailyBoxesProcessedRatio = "HighDailyBoxesProcessedRatio";
-		}
-		
-		return dailyBoxesProcessedRatio;
-	}
 
-	
 	public static void main(String[] args) throws IOException, ParseException {
 
 		String waves = "./files/DATASETS/HubCentric/waves.csv";
@@ -116,10 +24,10 @@ public class HubCentricNeo4JGraphGenerator {
 
 		//get data from waves
 		List<HubData> wavesHubDataList = aggregateWaveData(waves);
-		
+
 		//get data from xdlus
 		List<HubData> xdluHubDataList = aggregateXDLUData(xdlu);
-		
+
 		//get max data
 		List<HubData> maxList = aggregateMaxData(max);
 
@@ -131,102 +39,40 @@ public class HubCentricNeo4JGraphGenerator {
 
 		//print to different csv files
 		String hub_csv = "./files/DATASETS/HubCentric/Nodes/Hub.csv";
-		String wave_csv = "./files/DATASETS/HubCentric/Nodes/Wave.csv";
-		String crossdockloadingunit_csv = "./files/DATASETS/HubCentric/Nodes/CDLU.csv";
-		String lowCP_csv = "./files/DATASETS/HubCentric/Nodes/LowCP.csv";
-		String highCP_csv = "./files/DATASETS/HubCentric/Nodes/HighCP.csv";
 
-		String processesCrossDockLoadingUnit_csv = "./files/DATASETS/HubCentric/Relationships/PROCESSES_CROSSDOCKLOADINGUNITS.csv";
-		String processesWave_csv = "./files/DATASETS/HubCentric/Relationships/PROCESSES_WAVES.csv";
+		String hasThroughput_csv = "./files/DATASETS/HubCentric/Relationships/hasThroughput.csv";
+		String hasCapacityPrediction_csv = "./files/DATASETS/HubCentric/Relationships/hasCapacityPrediction.csv";
 
-		//adding relations to low lcp and high lcp
-		String hasLowCP_csv = "./files/DATASETS/HubCentric/Relationships/HAS_LOW_CP.csv";
-		String hasHighCP_csv = "./files/DATASETS/HubCentric/Relationships/HAS_HIGH_CP.csv";
 
 		BufferedWriter hub_br = null;
-		BufferedWriter wave_br = null;
-		BufferedWriter cdlu_br = null;
-		BufferedWriter proc_cdlu_br = null;
-		BufferedWriter proc_wave_br = null;
-		BufferedWriter highCP_br = null;
-		BufferedWriter lowCP_br = null;
-		BufferedWriter hasHighCP_br = null;
-		BufferedWriter hasLowCP_br = null;
-
+		
+		BufferedWriter hasThroughput_br = null;
+		BufferedWriter hasCapacityPrediction_br = null;
 
 		try {
 			hub_br = new BufferedWriter(new FileWriter(hub_csv));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
+		
 		try {
-			wave_br = new BufferedWriter(new FileWriter(wave_csv));
+			hasThroughput_br = new BufferedWriter(new FileWriter(hasThroughput_csv));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			hasCapacityPrediction_br = new BufferedWriter(new FileWriter(hasCapacityPrediction_csv));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		try {
-			cdlu_br = new BufferedWriter(new FileWriter(crossdockloadingunit_csv));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 
-		try {
-			proc_cdlu_br = new BufferedWriter(new FileWriter(processesCrossDockLoadingUnit_csv));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		try {
-			proc_wave_br = new BufferedWriter(new FileWriter(processesWave_csv));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		try {
-			highCP_br = new BufferedWriter(new FileWriter(highCP_csv));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		try {
-			lowCP_br = new BufferedWriter(new FileWriter(lowCP_csv));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		try {
-			hasHighCP_br = new BufferedWriter(new FileWriter(hasHighCP_csv));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		try {
-			hasLowCP_br = new BufferedWriter(new FileWriter(hasLowCP_csv));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		int counter = 0;
-		String waveId = null;
-		String cdluId = null;
-		String lowCPId = null;
-		String highCPId = null;
-
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Date currentDate = null;
 		Date dateFrom = new SimpleDateFormat("yyyy-MM-dd").parse("2020-01-01");
 		Date dateTo = new SimpleDateFormat("yyyy-MM-dd").parse("2021-12-31");
 
 		for (HubData hd : completeList) {
-
-			counter++;
-			waveId = "wave" + counter;
-			cdluId = "cdlu" + counter;
-			lowCPId = "lowCP" + counter;
-			highCPId = "highCP" + counter;
-
 
 			currentDate = new SimpleDateFormat("yyyy-MM-dd").parse(hd.getDate());
 
@@ -235,35 +81,35 @@ public class HubCentricNeo4JGraphGenerator {
 
 				hub_br.write(hd.getHubId() + "," + hd.getHub() + "," + hd.getDate() + "," + hd.getRelativeToMaxCapacity() + "," + "Hub");
 				hub_br.newLine();
-				cdlu_br.write(cdluId + "_" + hd.getHubId() + "," + hd.getTotalVolume() + "," + hd.getTotalWeight() + "," + "CrossDockLoadingUnit");
-				cdlu_br.newLine();
-				wave_br.write(waveId + "_" + hd.getHubId() + "," + hd.getQttShipments() + "," + hd.getQttBoxesProcessed() + "," + hd.getQttPalletsBuilt() + "," + "Wave");
-				wave_br.newLine();
-				proc_cdlu_br.write(hd.getHubId() + "," + cdluId + "_" + hd.getHubId() + "," + "PROCESSES_CROSSDOCKLOADINGUNIT");
-				proc_cdlu_br.newLine();
-				proc_wave_br.write(hd.getHubId() + "," + waveId + "_" + hd.getHubId() + "," + "PROCESSES_WAVE");
-				proc_wave_br.newLine();
-
-				if (hd.highCP == true) {
-
-					highCP_br.write(highCPId + "_" + hd.getHubId() + "," + hd.getHub() + "," + hd.getDate() + "," + "HighCapacityPrediction");
-					highCP_br.newLine();
-
-					hasHighCP_br.write(hd.getHubId() + "," + highCPId + "_" + hd.getHubId() + "," + "HAS_HIGH_CP");
-					hasHighCP_br.newLine();
-
-				} else {
-
-					lowCP_br.write(lowCPId + "_" + hd.getHubId() + "," + hd.getHub() + "," + hd.getDate() + "," + "LowCapacityPrediction");
-					lowCP_br.newLine();
-
-					hasLowCP_br.write(hd.getHubId() + "," + lowCPId + "_" + hd.getHubId() + "," + "HAS_LOW_CP");
-					hasLowCP_br.newLine();
-				}
+				
+				//shipments throughput
+				hasThroughput_br.write(hd.getHubId() + "," + hd.getShipmentsThroughputMeasurement() + "," + "hasThroughput");
+				hasThroughput_br.newLine();
+				
+				//volume throughput
+				hasThroughput_br.write(hd.getHubId() + "," + hd.getVolumeThroughputMeasurement() + "," + "hasThroughput");
+				hasThroughput_br.newLine();
+				
+				//weight throughput
+				hasThroughput_br.write(hd.getHubId() + "," + hd.getWeightThroughputMeasurement() + "," + "hasThroughput");
+				hasThroughput_br.newLine();
+				
+				//pallets throughput
+				hasThroughput_br.write(hd.getHubId() + "," + hd.getPalletsThroughputMeasurement() + "," + "hasThroughput");
+				hasThroughput_br.newLine();
+				
+				//boxes throughput
+				hasThroughput_br.write(hd.getHubId() + "," + hd.getBoxesThroughputMeasurement() + "," + "hasThroughput");
+				hasThroughput_br.newLine();
+				
+				//write capacity prediction
+				hasCapacityPrediction_br.write(hd.getHubId() + "," + hd.getCapacityPrediction() + "," + "hasCapacityPrediction");
+				hasCapacityPrediction_br.newLine();				
 
 			}
 
 		}
+		
 
 		try {
 			hub_br.close();
@@ -272,54 +118,19 @@ public class HubCentricNeo4JGraphGenerator {
 		}
 
 		try {
-			wave_br.close();
+			hasThroughput_br.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
 		try {
-			cdlu_br.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		try {
-			proc_cdlu_br.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		try {
-			proc_wave_br.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		try {
-			highCP_br.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		try {
-			lowCP_br.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		try {
-			hasHighCP_br.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		try {
-			hasLowCP_br.close();
+			hasCapacityPrediction_br.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
 	}
+	
 
 	public static List<HubData> aggregateWaveData (String waves) {
 
@@ -344,6 +155,8 @@ public class HubCentricNeo4JGraphGenerator {
 		int qttShipments = 0;
 		int qttBoxes = 0;
 		int qttPallets = 0;
+
+		//TODO: Is this the place to add static hub data (terminal equipment and terminal size)?
 
 		try {
 			while ((line = br.readLine()) != null) {
@@ -462,6 +275,8 @@ public class HubCentricNeo4JGraphGenerator {
 		int maxShipments = 0;
 		double maxVolume = 0;
 		double maxWeight = 0;
+		int maxPallets = 0;
+		int maxBoxes = 0;
 
 		try {
 			while ((line = br.readLine()) != null) {
@@ -471,12 +286,16 @@ public class HubCentricNeo4JGraphGenerator {
 				maxShipments = Integer.parseInt(params[1]);
 				maxVolume = Double.parseDouble(params[2]);
 				maxWeight = Double.parseDouble(params[3]);
+				maxPallets = Integer.parseInt(params[4]);
+				maxBoxes = Integer.parseInt(params[5]);
 
 				maxData = new HubData.HubDataBuilder()
 						.setHub(hub)
 						.setMaxShipments(maxShipments)
 						.setMaxVolume(maxVolume)
 						.setMaxWeight(maxWeight)
+						.setMaxPallets(maxPallets)
+						.setMaxBoxes(maxBoxes)
 						.build();
 
 				maxList.add(maxData);
@@ -495,7 +314,7 @@ public class HubCentricNeo4JGraphGenerator {
 		return maxList;
 
 	}
-	
+
 	public static List<HubData> createCommonList (List<HubData> wavesHubDataList, List<HubData> xdluHubDataList, List<HubData> maxList) {
 
 		//iterate all three lists and create a common list
@@ -522,6 +341,8 @@ public class HubCentricNeo4JGraphGenerator {
 								.setMaxShipments(maxXdluAndWavesData.getMaxShipments())
 								.setMaxVolume(maxXdluAndWavesData.getMaxVolume())
 								.setMaxWeight(maxXdluAndWavesData.getMaxWeight())
+								.setMaxPallets(maxXdluAndWavesData.getMaxPallets())
+								.setMaxBoxes(maxXdluAndWavesData.getMaxBoxes())
 								.build();
 
 						commonList.add(commonHubData);
@@ -543,11 +364,19 @@ public class HubCentricNeo4JGraphGenerator {
 		double relativeMaxShipment = 0;
 		double relativeMaxVolume = 0;
 		double relativeMaxWeight = 0;
+		
+		String shipmentsThroughput = null;
+		String weightThroughput = null;
+		String volumeThroughput = null;
+		String palletsThroughput = null;
+		String boxesThroughput = null;
+		String capacityPrediction = null;
 
 		//attribute to hold whether the relativeToMaxCapacity is > 0.5
 		boolean highCP = false;
 
 		//relativeMaxCapacity is computed as the average of shipments, volume and weight
+		//TODO: implement these computations in separate method
 		for (HubData hd : hubDataList) {
 
 			//tweaking these since some discrepancy in modifiedOn (waves resp xdlu) results in daily max being larger than periodic max
@@ -572,19 +401,27 @@ public class HubCentricNeo4JGraphGenerator {
 
 			relativeMax = (relativeMaxShipment + relativeMaxVolume + relativeMaxWeight) / 3;
 
-			System.out.println("RelativeToMaxCapacity score for " + hd.getHubId() + " is: " + relativeMax);
-
 			//if the relativeToMaxCapacity is below the set threshold, then highCP is true
 			if (relativeMax < CP_THRESHOLD) {
 				highCP = true;
 			} else {
 				highCP = false;
 			}
+			
+			shipmentsThroughput = computeShipmentsThroughputMeasurement(hd.getMaxShipments(), hd.getQttShipments(), CP_THRESHOLD);
+			weightThroughput = computeWeightThroughputMeasurement(hd.getMaxWeight(), hd.getTotalWeight(), CP_THRESHOLD);
+			volumeThroughput = computeVolumeThroughputMeasurement(hd.getMaxVolume(), hd.getTotalVolume(), CP_THRESHOLD);
+			palletsThroughput = computePalletsThroughputMeasurement(hd.getMaxPallets(), hd.getQttPalletsBuilt(), CP_THRESHOLD);
+			boxesThroughput = computeBoxesThroughputMeasurement(hd.getMaxBoxes(), hd.getQttBoxesProcessed(), CP_THRESHOLD);
+			
+			if (highCP) {
+				capacityPrediction = "HighCapacityPrediction";
+			} else {
+				capacityPrediction = "LowCapacityPrediction";
+			}
+			
+			
 
-			System.out.println("HighCP is " + highCP);
-
-			//TODO: Add attributes for dailyWeightRatio, dailyVolumeRatio, dailyShipmentsRatio, dailyPalletsBuiltRatio, dailyBoxesProcessedRatio, 
-			//terminalEquipment (fixed per hub), and terminalSize (fixed per hub), 
 			revisedHubData = new HubData.HubDataBuilder()
 					.setHubId(hd.getHubId())
 					.setHub(hd.getHub())
@@ -598,7 +435,15 @@ public class HubCentricNeo4JGraphGenerator {
 					.setMaxShipments(hd.getMaxShipments())
 					.setMaxVolume(hd.getMaxVolume())
 					.setMaxWeight(hd.getMaxWeight())
+					.setMaxPallets(hd.getMaxPallets())
+					.setMaxBoxes(hd.getMaxBoxes())
+					.setShipmentsThroughputMeasurement(shipmentsThroughput)
+					.setWeightThroughputMeasurement(weightThroughput)
+					.setVolumeThroughputMeasurement(volumeThroughput)
+					.setPalletsThroughputMeasurement(palletsThroughput)
+					.setBoxesThroughputMeasurement(boxesThroughput)
 					.setHighCP(highCP)
+					.setCapacityPrediction(capacityPrediction)
 					.build();
 
 			revisedHubDataList.add(revisedHubData);
@@ -609,6 +454,86 @@ public class HubCentricNeo4JGraphGenerator {
 		return revisedHubDataList;
 
 	}
+
+	private static String computeWeightThroughputMeasurement (double max, double daily, double threshold) {
+
+		//round to 2 decimals
+		double ratio = round((daily / max), 2);
+		String weightThroughputMeasurement = null;
+
+		if (ratio < threshold) {
+			weightThroughputMeasurement = "LowWeightThroughput";
+		} else {
+			weightThroughputMeasurement = "HighWeightThroughput";
+		}
+
+		return weightThroughputMeasurement;
+	}
+
+	private static String computeVolumeThroughputMeasurement (double max, double daily, double threshold) {
+
+		//round to 2 decimals
+		double ratio = round((daily / max), 2);
+		String volumeTroughputMeasurement = null;
+
+		if (ratio < threshold) {
+			volumeTroughputMeasurement = "LowVolumeThroughput";	
+		} else {
+			volumeTroughputMeasurement = "HighVolumeThroughput";
+		}
+
+		return volumeTroughputMeasurement;
+	}
+
+	private static String computeShipmentsThroughputMeasurement (int max, int daily, double threshold) {
+
+		//round to 2 decimals
+		double ratio = round(((double)daily / (double)max), 2);
+		String shipmentsThroughputMeasurement = null;
+
+		if (ratio < threshold) {
+			shipmentsThroughputMeasurement = "LowShipmentsThroughput";		
+		} else {
+			shipmentsThroughputMeasurement = "HighShipmentsThroughput";
+		}
+
+		return shipmentsThroughputMeasurement;
+	}
+
+	private static String computePalletsThroughputMeasurement (int max, int daily, double threshold) {
+
+		//round to 2 decimals
+		double ratio = round(((double)daily / (double)max), 2);
+		String palletsThroughputMeasurement = null;
+
+		if (ratio < threshold) {
+			palletsThroughputMeasurement = "LowPalletsThroughput";
+		} else {
+			palletsThroughputMeasurement = "HighPalletsThroughput";
+		}
+
+		return palletsThroughputMeasurement;
+	}
+
+	private static String computeBoxesThroughputMeasurement (int max, int daily, double threshold) {
+
+		//round to 2 decimals
+		double ratio = round(((double)daily / (double)max), 2);
+		String boxesThroughputMeasurement = null;
+
+		if (ratio < threshold) {
+			boxesThroughputMeasurement = "LowBoxesThroughput";
+		} else {
+			boxesThroughputMeasurement = "HighBoxesThroughput";
+		}
+
+		return boxesThroughputMeasurement;
+	}
+
+	private static double round (double value, int precision) { 
+		int scale = (int) Math.pow(10, precision); 
+		return (double) Math.round(value * scale) / scale; 
+	} 
 
 	public static class HubData {
 		private String hubId;
@@ -623,7 +548,16 @@ public class HubCentricNeo4JGraphGenerator {
 		private int maxShipments;
 		private double maxVolume;
 		private double maxWeight;
+		private int maxPallets;
+		private int maxBoxes;
 		private boolean highCP;
+		private String weightThroughputMeasurement;
+		private String volumeThroughputMeasurement;
+		private String shipmentsThroughputMeasurement;
+		private String palletsThroughputMeasurement;
+		private String boxesThroughputMeasurement;
+		private String capacityPrediction;
+		
 
 		private HubData(HubDataBuilder builder) {
 			this.hubId = builder.hubId;
@@ -638,7 +572,15 @@ public class HubCentricNeo4JGraphGenerator {
 			this.maxShipments = builder.maxShipments;
 			this.maxVolume = builder.maxVolume;
 			this.maxWeight = builder.maxWeight;
+			this.maxPallets = builder.maxPallets;
+			this.maxBoxes = builder.maxBoxes;
 			this.highCP = builder.highCP;
+			this.weightThroughputMeasurement = builder.weightThroughputMeasurement;
+			this.volumeThroughputMeasurement = builder.volumeThroughputMeasurement;
+			this.shipmentsThroughputMeasurement = builder.shipmentsThroughputMeasurement;
+			this.palletsThroughputMeasurement = builder.palletsThroughputMeasurement;
+			this.boxesThroughputMeasurement = builder.boxesThroughputMeasurement;
+			this.capacityPrediction = builder.capacityPrediction;
 		}
 
 		public static class HubDataBuilder {
@@ -655,7 +597,15 @@ public class HubCentricNeo4JGraphGenerator {
 			private int maxShipments;
 			private double maxVolume;
 			private double maxWeight;
+			private int maxPallets;
+			private int maxBoxes;
 			private boolean highCP;
+			private String weightThroughputMeasurement;
+			private String volumeThroughputMeasurement;
+			private String shipmentsThroughputMeasurement;
+			private String palletsThroughputMeasurement;
+			private String boxesThroughputMeasurement;
+			private String capacityPrediction;
 
 			public HubDataBuilder() {}
 
@@ -703,7 +653,6 @@ public class HubCentricNeo4JGraphGenerator {
 				return this;
 			}
 
-
 			public HubDataBuilder setMaxShipments(int maxShipments) {
 				this.maxShipments = maxShipments;
 				return this;
@@ -718,9 +667,49 @@ public class HubCentricNeo4JGraphGenerator {
 				this.maxWeight = maxWeight;
 				return this;
 			}
+			
+			public HubDataBuilder setMaxPallets(int maxPallets) {
+				this.maxPallets = maxPallets;
+				return this;
+			}
+			
+			public HubDataBuilder setMaxBoxes(int maxBoxes) {
+				this.maxBoxes = maxBoxes;
+				return this;
+			}
 
 			public HubDataBuilder setHighCP(boolean highCP) {
 				this.highCP = highCP;
+				return this;
+			}
+
+			public HubDataBuilder setWeightThroughputMeasurement(String weightThroughputMeasurement) {
+				this.weightThroughputMeasurement = weightThroughputMeasurement;
+				return this;
+			}
+
+			public HubDataBuilder setVolumeThroughputMeasurement(String volumeThroughputMeasurement) {
+				this.volumeThroughputMeasurement = volumeThroughputMeasurement;
+				return this;
+			}
+
+			public HubDataBuilder setShipmentsThroughputMeasurement(String shipmentsThroughputMeasurement) {
+				this.shipmentsThroughputMeasurement = shipmentsThroughputMeasurement;
+				return this;
+			}
+
+			public HubDataBuilder setPalletsThroughputMeasurement(String palletsThroughputMeasurement) {
+				this.palletsThroughputMeasurement = palletsThroughputMeasurement;
+				return this;
+			}
+
+			public HubDataBuilder setBoxesThroughputMeasurement(String boxesThroughputMeasurement) {
+				this.boxesThroughputMeasurement = boxesThroughputMeasurement;
+				return this;
+			}
+			
+			public HubDataBuilder setCapacityPrediction(String capacityPrediction) {
+				this.capacityPrediction = capacityPrediction;
 				return this;
 			}
 
@@ -776,9 +765,41 @@ public class HubCentricNeo4JGraphGenerator {
 		public double getMaxWeight() {
 			return maxWeight;
 		}
+		
+		public int getMaxPallets() {
+			return maxPallets;
+		}
+		
+		public int getMaxBoxes() {
+			return maxBoxes;
+		}
 
 		public boolean isHighCP() {
 			return highCP;
+		}
+
+		public String getWeightThroughputMeasurement() {
+			return weightThroughputMeasurement;
+		}
+
+		public String getVolumeThroughputMeasurement() {
+			return volumeThroughputMeasurement;
+		}
+
+		public String getShipmentsThroughputMeasurement() {
+			return shipmentsThroughputMeasurement;
+		}
+
+		public String getPalletsThroughputMeasurement() {
+			return palletsThroughputMeasurement;
+		}
+
+		public String getBoxesThroughputMeasurement() {
+			return boxesThroughputMeasurement;
+		}
+		
+		public String getCapacityPrediction() {
+			return capacityPrediction;
 		}
 
 	}

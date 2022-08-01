@@ -10,6 +10,92 @@ public class MiscTest {
 		int scale = (int) Math.pow(10, precision); 
 		return (double) Math.round(value * scale) / scale; 
 	} 
+	
+	private static String computeWeightThroughputMeasurement (double max, double daily) {
+
+		//round to 2 decimals
+		double ratio = round((daily / max), 2);
+		String weightThroughputMeasurement = null;
+
+		if (ratio <= 0.33) {
+			weightThroughputMeasurement = "LowWeightThroughput";
+		} else if (ratio >= 0.34 && ratio <= 0.66) {
+			weightThroughputMeasurement = "MediumWeightThroughput";
+		} else {
+			weightThroughputMeasurement = "HighWeightThroughput";
+		}
+
+		return weightThroughputMeasurement;
+	}
+
+	private static String computeVolumeThroughputMeasurement (double max, double daily) {
+
+		//round to 2 decimals
+		double ratio = round((daily / max), 2);
+		String volumeTroughputMeasurement = null;
+
+		if (ratio <= 0.33) {
+			volumeTroughputMeasurement = "LowVolumeThroughput";
+		} else if (ratio >= 0.34 && ratio <= 0.66) {
+			volumeTroughputMeasurement = "MediumVolumeThroughput";
+		} else {
+			volumeTroughputMeasurement = "HighVolumeThroughput";
+		}
+
+		return volumeTroughputMeasurement;
+	}
+
+	private static String computeShipmentsThroughputMeasurement (int max, int daily) {
+
+		//round to 2 decimals
+		double ratio = round(((double)daily / (double)max), 2);
+		String shipmentsThroughputMeasurement = null;
+
+		if (ratio <= 0.33) {
+			shipmentsThroughputMeasurement = "LowShipmentsThroughput";
+		} else if (ratio >= 0.34 && ratio <= 0.66) {
+			shipmentsThroughputMeasurement = "MediumShipmentsThroughput";
+		} else {
+			shipmentsThroughputMeasurement = "HighShipmentsThroughput";
+		}
+
+		return shipmentsThroughputMeasurement;
+	}
+
+	private static String computePalletsThroughputMeasurement (int max, int daily) {
+
+		//round to 2 decimals
+		double ratio = round(((double)daily / (double)max), 2);
+		String palletsThroughputMeasurement = null;
+
+		if (ratio <= 0.33) {
+			palletsThroughputMeasurement = "LowPalletsThroughput";
+		} else if (ratio >= 0.34 && ratio <= 0.66) {
+			palletsThroughputMeasurement = "MediumPalletsThroughput";
+		} else {
+			palletsThroughputMeasurement = "HighPalletsThroughput";
+		}
+
+		return palletsThroughputMeasurement;
+	}
+
+	private static String computeBoxesThroughputMeasurement (int max, int daily) {
+
+		//round to 2 decimals
+		double ratio = round(((double)daily / (double)max), 2);
+		String boxesThroughputMeasurement = null;
+
+		if (ratio <= 0.33) {
+			boxesThroughputMeasurement = "LowBoxesThroughput";
+		} else if (ratio >= 0.34 && ratio <= 0.66) {
+			boxesThroughputMeasurement = "MediumBoxesThroughput";
+		} else {
+			boxesThroughputMeasurement = "HighBoxesThroughput";
+		}
+
+		return boxesThroughputMeasurement;
+	}
+
 
 	private static String computeDailyShipmentsRatio (int max, int daily) {
 
