@@ -12,13 +12,10 @@ import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.http.HTTPRepository;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonSyntaxException;
-
 
 public class SparqlQuery {
 
-	public static void main(String[] args) throws JsonSyntaxException, JsonIOException, OWLOntologyCreationException, IOException {
+	public static void main(String[] args) throws OWLOntologyCreationException, IOException {
 
 
 		String test = createSparqlQuery();
