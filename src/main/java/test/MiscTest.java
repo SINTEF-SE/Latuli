@@ -5,6 +5,42 @@ import java.util.List;
 import java.util.Random;
 
 public class MiscTest {
+	
+	public static void main(String[] args) {
+
+//		int max = 100;
+//		int daily = 67;
+//
+//		System.out.println("Daily shipment ratio is " + computeDailyShipmentsRatio(max, daily));
+//
+//		List<String> TerminalEquipmentList = new ArrayList<String>();
+//		TerminalEquipmentList.add("FullyAutomatedTerminalEquipment");
+//		TerminalEquipmentList.add("PartiallyAutomatedTerminalEquipment");
+//		TerminalEquipmentList.add("OnlyManualTerminalEquipment");
+//
+//		System.out.println("Terminal Equipment is " + getRandomTerminalEquipment());
+		
+		String correctPrediction = null;
+		
+		double lowPredictionScore = -3.1403613;
+		double highPredictionScore = -2.570557;
+		double relativeToMaxCapacity = 0.4886781140759853;
+		
+		if (lowPredictionScore > highPredictionScore && relativeToMaxCapacity >= 0.75) {
+			correctPrediction = "Y";
+			
+		} else if (highPredictionScore > lowPredictionScore && relativeToMaxCapacity < 0.75) {
+			correctPrediction = "Y";
+			
+		} else {
+			
+			correctPrediction = "N";
+		}
+		
+		System.out.println("CorrectPrediction: " + correctPrediction);
+
+
+	}
 
 	private static double round (double value, int precision) { 
 		int scale = (int) Math.pow(10, precision); 
@@ -138,21 +174,6 @@ public class MiscTest {
 		return terminalSizeList.get(random.nextInt(terminalSizeList.size()));
 	}
 
-	public static void main(String[] args) {
 
-		int max = 100;
-		int daily = 67;
-
-		System.out.println("Daily shipment ratio is " + computeDailyShipmentsRatio(max, daily));
-
-		List<String> TerminalEquipmentList = new ArrayList<String>();
-		TerminalEquipmentList.add("FullyAutomatedTerminalEquipment");
-		TerminalEquipmentList.add("PartiallyAutomatedTerminalEquipment");
-		TerminalEquipmentList.add("OnlyManualTerminalEquipment");
-
-		System.out.println("Terminal Equipment is " + getRandomTerminalEquipment());
-
-
-	}
 
 }

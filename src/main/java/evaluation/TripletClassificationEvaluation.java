@@ -26,11 +26,24 @@ public class TripletClassificationEvaluation {
 //		String highPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Complex/df_high.csv";
 //		String evaluationFile = "./files/DATASETS/HubCentric/Pykeen/Complex/evaluationFile.csv";
 		
-		/** TransE **/
-		String neo4jDataFile = "./files/DATASETS/HubCentric/Pykeen/Transe/neo4j_data.csv";
-		String lowPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Transe/df_low.csv";
-		String highPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Transe/df_high.csv";
-		String evaluationFile = "./files/DATASETS/HubCentric/Pykeen/Transe/evaluationFile.csv";
+//		/** TransE **/
+//		String neo4jDataFile = "./files/DATASETS/HubCentric/Pykeen/Transe/neo4j_data.csv";
+//		String lowPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Transe/df_low.csv";
+//		String highPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Transe/df_high.csv";
+//		String evaluationFile = "./files/DATASETS/HubCentric/Pykeen/Transe/evaluationFile.csv";
+		
+//		/** TucKER **/
+//		String neo4jDataFile = "./files/DATASETS/HubCentric/Pykeen/Tucker/neo4j_data.csv";
+//		String lowPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Tucker/df_low.csv";
+//		String highPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Tucker/df_high.csv";
+//		String evaluationFile = "./files/DATASETS/HubCentric/Pykeen/Tucker/evaluationFile.csv";
+		
+		/** ConvE **/
+		String neo4jDataFile = "./files/DATASETS/HubCentric/Pykeen/Conve/neo4j_data.csv";
+		String lowPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Conve/df_low.csv";
+		String highPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Conve/df_high.csv";
+		String evaluationFile = "./files/DATASETS/HubCentric/Pykeen/Conve/evaluationFile.csv";
+		
 		
 		constructEvaluationHubs(neo4jDataFile, lowPredictionsFile, highPredictionsFile, evaluationFile);
 		evaluate(evaluationFile);
