@@ -23,14 +23,150 @@ import utilities.StringUtilities;
  *
  */
 public class HubReconstructionLocations {
-	
+
 	final static String DATATYPE_INT = "^^<http://www.w3.org/2001/XMLSchema#int";
 	final static String DATATYPE_DATETIME = "^^<http://www.w3.org/2001/XMLSchema#dateTime";
 	final static String DATATYPE_STRING = "^^<http://www.w3.org/2001/XMLSchema#string";
 	final static String DATATYPE_DECIMAL = "^^<http://www.w3.org/2001/XMLSchema#decimal";
-	
+
+	public static void processSimpleHubReconstructionLocationsToNTriple (File hubReconstructionLocationsFolder, String ntFile) {
+
+		String rdf_type = " <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ";
+		String baseURI = "<https://w3id.org/latuli/ontology/m3#";
+		String type = "HubReconstructionLocation";
+		String tripleClosure = "> .\n";
+
+		String hubReconstructionLocationEntity;
+
+		File[] filesInDir = hubReconstructionLocationsFolder.listFiles();
+
+		BufferedReader br = null;
+		BufferedWriter bw = null;
+
+		List<String[]> line = new ArrayList<String[]>();
+
+
+		for (int i = 0; i < filesInDir.length; i++) {
+
+
+			try {
+
+
+				br = new BufferedReader(new FileReader(filesInDir[i]));
+				bw = new BufferedWriter(new FileWriter(ntFile, true));
+
+				try {
+					line = StringUtilities.oneByOne(br);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				for (String[] params : line) {
+
+					hubReconstructionLocationEntity = params[0] + "_hubReconstructionLocation>";
+
+					//rdf:type
+					bw.write(KGUtilities.createType(hubReconstructionLocationEntity, baseURI, rdf_type, type, tripleClosure));
+
+					//hasHubParty						
+					bw.write(KGUtilities.createObjectProperty(hubReconstructionLocationEntity, baseURI, "hasHubParty", params[0], "_party", tripleClosure));
+
+					//additionalPartyIdentification
+					bw.write(KGUtilities.createDataProperty(hubReconstructionLocationEntity, baseURI, "additionalPartyIdentification", params[0], DATATYPE_STRING, tripleClosure));
+
+				}//end for
+
+			} catch (IOException e) {
+
+				e.printStackTrace();
+
+			} finally {
+
+				try {
+					if (br != null)
+						br.close();
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
+
+				try {
+					if (bw != null)
+						bw.close();
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
+			}
+
+		}
+	}
+
+	public static void processSimpleHubReconstructionLocationsToTSV (File hubReconstructionLocationsFolder, String tsvFile) {
+
+		String hubReconstructionLocationEntity;
+
+		File[] filesInDir = hubReconstructionLocationsFolder.listFiles();
+
+		BufferedReader br = null;
+		BufferedWriter bw = null;
+
+		List<String[]> line = new ArrayList<String[]>();
+
+
+		for (int i = 0; i < filesInDir.length; i++) {
+
+
+			try {
+
+
+				br = new BufferedReader(new FileReader(filesInDir[i]));
+				bw = new BufferedWriter(new FileWriter(tsvFile, true));
+
+				try {
+					line = StringUtilities.oneByOne(br);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				for (String[] params : line) {
+
+					hubReconstructionLocationEntity = params[0] + "_hubReconstructionLocation";
+
+					bw.write(hubReconstructionLocationEntity + "\t" + "isType" + "\t" + "HubReconstructionLocation" + "\n");
+
+					//hasHubParty						
+					bw.write(hubReconstructionLocationEntity + "\t" + "hasHubParty" + "\t" + params[3] + "_party" + "\n");
+
+					//hasAdditionalPartyId
+					bw.write(hubReconstructionLocationEntity + "\t" + "hasAdditionalPartyId" + "\t" + params[1] + "\n");
+
+				}//end for
+
+			} catch (IOException e) {
+
+				e.printStackTrace();
+
+			} finally {
+
+				try {
+					if (br != null)
+						br.close();
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
+
+				try {
+					if (bw != null)
+						bw.close();
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
+			}
+
+		}
+	}
+
 	public static void processHubReconstructionLocationsToNTriple (File hubReconstructionLocationsFolder, String ntFile) {
-		
+
 		String rdf_type = " <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ";
 		String baseURI = "<https://w3id.org/latuli/ontology/m3#";
 		String type = "HubReconstructionLocation";
@@ -56,7 +192,7 @@ public class HubReconstructionLocations {
 				bw = new BufferedWriter(new FileWriter(ntFile, true));
 
 				//System.out.println("Reading file: " + filesInDir[i].getName());
-				
+
 				try {
 					line = StringUtilities.oneByOne(br);
 				} catch (Exception e) {
@@ -66,19 +202,19 @@ public class HubReconstructionLocations {
 				for (String[] params : line) {
 
 					hubReconstructionLocationEntity = params[0] + "_hubReconstructionLocation>";
-					
+
 					//rdf:type
 					bw.write(KGUtilities.createType(hubReconstructionLocationEntity, baseURI, rdf_type, type, tripleClosure));
-					
+
 					//hasHubParty						
 					bw.write(KGUtilities.createObjectProperty(hubReconstructionLocationEntity, baseURI, "hasHubParty", params[3], "_party", tripleClosure));
 
 					//hubReconstructionLocationId
 					bw.write(KGUtilities.createDataProperty(hubReconstructionLocationEntity, baseURI, "hubReconstructionLocationId", params[0], DATATYPE_STRING, tripleClosure));
-			
+
 					//additionalPartyIdentification
 					bw.write(KGUtilities.createDataProperty(hubReconstructionLocationEntity, baseURI, "additionalPartyIdentification", params[1], DATATYPE_STRING, tripleClosure));
-					
+
 					//reconstructionLane
 					bw.write(KGUtilities.createDataProperty(hubReconstructionLocationEntity, baseURI, "reconstructionLane", params[4], DATATYPE_STRING, tripleClosure));
 
@@ -96,7 +232,7 @@ public class HubReconstructionLocations {
 				} catch (IOException ex) {
 					ex.printStackTrace();
 				}
-				
+
 				try {
 					if (bw != null)
 						bw.close();
@@ -107,7 +243,7 @@ public class HubReconstructionLocations {
 
 		}
 	}
-	
+
 	public static void processHubReconstructionLocationsToTSV (File hubReconstructionLocationsFolder, String tsvFile) {
 
 		String hubReconstructionLocationEntity;
@@ -130,7 +266,7 @@ public class HubReconstructionLocations {
 				bw = new BufferedWriter(new FileWriter(tsvFile, true));
 
 				//System.out.println("Reading file: " + filesInDir[i].getName());
-				
+
 				try {
 					line = StringUtilities.oneByOne(br);
 				} catch (Exception e) {
@@ -140,9 +276,9 @@ public class HubReconstructionLocations {
 				for (String[] params : line) {
 
 					hubReconstructionLocationEntity = params[0] + "_hubReconstructionLocation";
-					
+
 					bw.write(hubReconstructionLocationEntity + "\t" + "isType" + "\t" + "HubReconstructionLocation" + "\n");
-					
+
 					//hasHubParty						
 					bw.write(hubReconstructionLocationEntity + "\t" + "hasHubParty" + "\t" + params[3] + "_party" + "\n");
 
@@ -150,11 +286,11 @@ public class HubReconstructionLocations {
 					//hasHubReconstructionLocation
 					bw.write(hubReconstructionLocationEntity + "\t" + "hasHubReconstructionLocation" + "\t" + params[0] + "\n");
 
-					
+
 					//hasAdditionalPartyId
 					bw.write(hubReconstructionLocationEntity + "\t" + "hasAdditionalPartyId" + "\t" + params[1] + "\n");
 
-					
+
 					//hasLaneId
 					bw.write(hubReconstructionLocationEntity + "\t" + "hasLaneId" + "\t" + params[4] + "\n");
 
@@ -173,7 +309,7 @@ public class HubReconstructionLocations {
 				} catch (IOException ex) {
 					ex.printStackTrace();
 				}
-				
+
 				try {
 					if (bw != null)
 						bw.close();
@@ -189,7 +325,7 @@ public class HubReconstructionLocations {
 
 
 		try (RepositoryConnection connection = repo.getConnection()) {
-			
+
 			connection.setNamespace("m3", baseURI);
 
 			ValueFactory vf = connection.getValueFactory();
@@ -222,7 +358,7 @@ public class HubReconstructionLocations {
 						//adding type
 						hubReconstructionInd = vf.createIRI(baseURI, params[0] + "_hubReconstructionLocation");			
 						connection.add(hubReconstructionInd, RDF.TYPE, hubReconstructionClass);
-						
+
 						//adding predicates
 						partyInd = vf.createIRI(baseURI, params[3] + "_party");
 						connection.add(partyInd, RDF.TYPE, terminalOperatorClass);
@@ -253,15 +389,15 @@ public class HubReconstructionLocations {
 			}
 
 		}
-		
+
 		repo.shutDown();
 
 	}
-	
+
 	public static void processHubReconstructionLocationsToRemoteRepo (File hubReconstructionLocationsFolder, String baseURI, String rdf4jServer, String repositoryId, Repository repo) {
 
 		try (RepositoryConnection connection = repo.getConnection()) {
-			
+
 			connection.setNamespace("m3", baseURI);
 
 			ValueFactory vf = connection.getValueFactory();
@@ -295,7 +431,7 @@ public class HubReconstructionLocations {
 						//adding type
 						hubReconstructionInd = vf.createIRI(baseURI, params[0] + "_hubReconstructionLocation");			
 						connection.add(hubReconstructionInd, RDF.TYPE, hubReconstructionClass);
-						
+
 						//adding predicates
 						partyInd = vf.createIRI(baseURI, params[3] + "_party");
 						connection.add(partyInd, RDF.TYPE, terminalOperatorClass);
@@ -326,7 +462,7 @@ public class HubReconstructionLocations {
 			}
 
 		}
-		
+
 		repo.shutDown();
 
 	}

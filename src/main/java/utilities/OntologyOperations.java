@@ -1,4 +1,4 @@
-package owlprocessing;
+package utilities;
 
 import java.util.ArrayList;
 import java.util.HashMap;

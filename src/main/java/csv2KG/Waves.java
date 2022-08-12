@@ -24,12 +24,191 @@ import utilities.StringUtilities;
  *
  */
 public class Waves {
-	
+
 	final static String DATATYPE_INT = "^^<http://www.w3.org/2001/XMLSchema#int";
 	final static String DATATYPE_DATETIME = "^^<http://www.w3.org/2001/XMLSchema#dateTime";
 	final static String DATATYPE_STRING = "^^<http://www.w3.org/2001/XMLSchema#string";
 	final static String DATATYPE_DECIMAL = "^^<http://www.w3.org/2001/XMLSchema#decimal";
-	
+
+	public static void processSimpleWavesToNTriple (File wavesFolder, String ntFile) {
+
+		String rdf_type = " <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ";
+		String baseURI = "<https://w3id.org/latuli/ontology/m3#";
+		String waveType = "Wave";
+		//String hubReconstructionLocationType = "HubReconstructionLocation";
+		String tripleClosure = "> .\n";
+
+		String waveEntity;
+
+		String hubReconstructionLocationEntity;
+
+		File[] filesInDir = wavesFolder.listFiles();
+
+		BufferedReader br = null;
+		BufferedWriter bw = null;
+
+		List<String[]> line = new ArrayList<String[]>();
+
+
+		for (int i = 0; i < filesInDir.length; i++) {
+
+			try {
+
+
+				br = new BufferedReader(new FileReader(filesInDir[i]));
+				bw = new BufferedWriter(new FileWriter(ntFile, true));
+
+				try {
+					line = StringUtilities.oneByOne(br);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				for (String[] params : line) {
+
+
+					//isType for Wave					
+					waveEntity = params[0] + "_wave>";
+					bw.write(KGUtilities.createType(waveEntity, baseURI, rdf_type, waveType, tripleClosure));
+
+					//isType for HubReconstructionLocation;
+					hubReconstructionLocationEntity = params[4] + "_hubReconstructionLocation";
+
+					//waveid
+					bw.write(KGUtilities.createDataProperty(waveEntity, baseURI, "waveId", params[0], DATATYPE_STRING, tripleClosure));
+
+					//isPlannedAt			
+					bw.write(KGUtilities.createObjectProperty(waveEntity, baseURI, "isPlannedAt", params[4], "_hubReconstructionLocation", tripleClosure));
+					//<https://w3id.org/latuli/ontology/m3#55064_wave> <https://w3id.org/latuli/ontology/m3#isPlannedAt>  <https://w3id.org/latuli/ontology/m3#C004_hubReconstructionLocation> .
+
+
+					//hasPlanned
+					bw.write(KGUtilities.createObjectProperty(hubReconstructionLocationEntity, baseURI, "hasPlanned", params[0], "_wave", tripleClosure));
+
+					//qttBoxesProcessed
+					bw.write(KGUtilities.createDataProperty(waveEntity, baseURI, "qttBoxesProcessed", params[18], DATATYPE_INT, tripleClosure));
+
+
+					//qttPalletsBuilt
+					bw.write(KGUtilities.createDataProperty(waveEntity, baseURI, "qttPalletsBuilt", params[19], DATATYPE_INT, tripleClosure));
+
+
+					//qttShipments
+					bw.write(KGUtilities.createDataProperty(waveEntity, baseURI, "qttShipments", params[21], DATATYPE_INT, tripleClosure));
+
+
+
+				}//end for
+
+			} catch (IOException e) {
+
+				e.printStackTrace();
+
+			} finally {
+
+				try {
+					if (br != null)
+						br.close();
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
+
+				try {
+					if (bw != null)
+						bw.close();
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
+			}
+
+		}
+	}
+
+	public static void processSimpleWavesToTSV (File wavesFolder, String tsvFile) {
+
+
+		String waveEntity;
+		String hubReconstructionLocationEntity;
+
+		File[] filesInDir = wavesFolder.listFiles();
+
+		BufferedReader br = null;
+		BufferedWriter bw = null;
+
+		List<String[]> line = new ArrayList<String[]>();
+
+
+		for (int i = 0; i < filesInDir.length; i++) {
+
+			try {
+
+
+				br = new BufferedReader(new FileReader(filesInDir[i]));
+				bw = new BufferedWriter(new FileWriter(tsvFile, true));
+
+				try {
+					line = StringUtilities.oneByOne(br);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				for (String[] params : line) {
+
+
+					//isType					
+					waveEntity = params[0] + "_wave";
+					bw.write(waveEntity + "\t" + "isType" + "\t" + "Wave" + "\n");
+
+					//hubReconstructionLocationEntity
+					hubReconstructionLocationEntity = params[4] + "_hubReconstructionLocation";
+
+					//hasWaveid
+					bw.write(waveEntity + "\t" + "hasWaveid" + "\t" + params[0] + "\n");
+
+					//isPlannedAt			
+					bw.write(waveEntity + "\t" + "isPlannedAt" + "\t" + params[4] + "_hubReconstructionLocation" + "\n");
+					System.out.println("Waves: " + waveEntity + "\t" + "isPlannedAt" + "\t" + params[4] + "_hubReconstructionLocation" + "\n");
+
+					//hasPlanned
+					bw.write(hubReconstructionLocationEntity + "\t" + "hasPlanned" + "\t" + params[0] + "_wave" + "\n");
+					System.out.println("Waves: " + hubReconstructionLocationEntity + "\t" + "hasPlanned" + "\t" + params[0] + "_wave" + "\n");
+
+					//hasQttBoxesProcessed
+					bw.write(waveEntity + "\t" + "hasQttBoxesProcessed" + "\t" + params[18] + "\n");
+
+					//hasQttPalletsBuilt
+					bw.write(waveEntity + "\t" + "hasQttPalletsBuilt" + "\t" + params[19] + "\n");
+
+					//hasQttShipments
+					bw.write(waveEntity + "\t" + "hasQttShipments" + "\t" + params[21] + "\n");
+
+
+				}//end for
+
+			} catch (IOException e) {
+
+				e.printStackTrace();
+
+			} finally {
+
+				try {
+					if (br != null)
+						br.close();
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
+
+				try {
+					if (bw != null)
+						bw.close();
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
+			}
+
+		}
+	}
+
 	public static void processWavesToNTriple (File wavesFolder, String ntFile) {
 
 		String rdf_type = " <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ";
@@ -57,7 +236,7 @@ public class Waves {
 
 
 				//System.out.println("Reading file: " + filesInDir[i].getName());
-				
+
 				try {
 					line = StringUtilities.oneByOne(br);
 				} catch (Exception e) {
@@ -182,7 +361,7 @@ public class Waves {
 
 		}
 	}
-	
+
 	public static void processWavesToTSV (File wavesFolder, String tsvFile) {
 
 
@@ -206,7 +385,7 @@ public class Waves {
 
 
 				//System.out.println("Reading file: " + filesInDir[i].getName());
-				
+
 				try {
 					line = StringUtilities.oneByOne(br);
 				} catch (Exception e) {
@@ -331,7 +510,7 @@ public class Waves {
 		System.out.println("Used Memory before ontology creation: " + usedMemoryBeforeOntologyCreation/1000000 + " MB");
 
 		try (RepositoryConnection connection = repo.getConnection()) {
-			
+
 			connection.setNamespace("m3", baseURI);
 
 			ValueFactory vf = connection.getValueFactory();
@@ -372,31 +551,31 @@ public class Waves {
 
 						//adding literals
 						connection.add(waveInd, vf.createIRI(baseURI + "waveId"), vf.createLiteral(params[0]));
-						
+
 						if (!StringUtilities.convertToDateTime(params[1]).equals("0000-00-00T00:00:00")) {
 							connection.add(waveInd, vf.createIRI(baseURI + "plannedOn"), vf.createLiteral(StringUtilities.convertToDateTime(params[1]), XMLSchema.DATETIME));								
 						}
-						
+
 						if (!StringUtilities.convertToDateTime(params[2]).equals("0000-00-00T00:00:00")) {
 							connection.add(waveInd, vf.createIRI(baseURI + "releasedOn"), vf.createLiteral(StringUtilities.convertToDateTime(params[2]), XMLSchema.DATETIME));								
 						}
-						
+
 						if (!StringUtilities.convertToDateTime(params[7]).equals("0000-00-00T00:00:00")) {
 							connection.add(waveInd, vf.createIRI(baseURI + "modifiedOn"), vf.createLiteral(StringUtilities.convertToDateTime(params[7]), XMLSchema.DATETIME));								
 						}
-						
+
 						if (!StringUtilities.convertToDateTime(params[8]).equals("0000-00-00T00:00:00")) {
 							connection.add(waveInd, vf.createIRI(baseURI + "closedOn"), vf.createLiteral(StringUtilities.convertToDateTime(params[8]), XMLSchema.DATETIME));								
 						}
-						
+
 						if (!StringUtilities.convertToDateTime(params[10]).equals("0000-00-00T00:00:00")) {
 							connection.add(waveInd, vf.createIRI(baseURI + "createdOn"), vf.createLiteral(StringUtilities.convertToDateTime(params[10]), XMLSchema.DATETIME));								
 						}
-						
+
 						if (!StringUtilities.convertToDateTime(params[13]).equals("0000-00-00T00:00:00")) {
 							connection.add(waveInd, vf.createIRI(baseURI + "waveStartProcessingOn"), vf.createLiteral(StringUtilities.convertToDateTime(params[13]), XMLSchema.DATETIME));								
 						}
-						
+
 						if (!StringUtilities.convertToDateTime(params[14]).equals("0000-00-00T00:00:00")) {
 							connection.add(waveInd, vf.createIRI(baseURI + "waveEndProcessingOn"), vf.createLiteral(StringUtilities.convertToDateTime(params[14]), XMLSchema.DATETIME));								
 						}
@@ -444,7 +623,7 @@ public class Waves {
 
 
 	}
-	
+
 	public static void processWavesToRemoteRepo (File wavesFolder, String baseURI, String rdf4jServer, String repositoryId, Repository repo) {
 
 		//measure runtime
@@ -456,7 +635,7 @@ public class Waves {
 		System.out.println("Used Memory before ontology creation: " + usedMemoryBeforeOntologyCreation/1000000 + " MB");
 
 		try (RepositoryConnection connection = repo.getConnection()) {
-			
+
 			connection.setNamespace("m3", baseURI);
 
 			ValueFactory vf = connection.getValueFactory();
@@ -497,31 +676,31 @@ public class Waves {
 
 						//adding literals
 						connection.add(waveInd, vf.createIRI(baseURI + "waveId"), vf.createLiteral(params[0]));
-						
+
 						if (!StringUtilities.convertToDateTime(params[1]).equals("0000-00-00T00:00:00")) {
 							connection.add(waveInd, vf.createIRI(baseURI + "plannedOn"), vf.createLiteral(StringUtilities.convertToDateTime(params[1]), XMLSchema.DATETIME));								
 						}
-						
+
 						if (!StringUtilities.convertToDateTime(params[2]).equals("0000-00-00T00:00:00")) {
 							connection.add(waveInd, vf.createIRI(baseURI + "releasedOn"), vf.createLiteral(StringUtilities.convertToDateTime(params[2]), XMLSchema.DATETIME));								
 						}
-						
+
 						if (!StringUtilities.convertToDateTime(params[7]).equals("0000-00-00T00:00:00")) {
 							connection.add(waveInd, vf.createIRI(baseURI + "modifiedOn"), vf.createLiteral(StringUtilities.convertToDateTime(params[7]), XMLSchema.DATETIME));								
 						}
-						
+
 						if (!StringUtilities.convertToDateTime(params[8]).equals("0000-00-00T00:00:00")) {
 							connection.add(waveInd, vf.createIRI(baseURI + "closedOn"), vf.createLiteral(StringUtilities.convertToDateTime(params[8]), XMLSchema.DATETIME));								
 						}
-						
+
 						if (!StringUtilities.convertToDateTime(params[10]).equals("0000-00-00T00:00:00")) {
 							connection.add(waveInd, vf.createIRI(baseURI + "createdOn"), vf.createLiteral(StringUtilities.convertToDateTime(params[10]), XMLSchema.DATETIME));								
 						}
-						
+
 						if (!StringUtilities.convertToDateTime(params[13]).equals("0000-00-00T00:00:00")) {
 							connection.add(waveInd, vf.createIRI(baseURI + "waveStartProcessingOn"), vf.createLiteral(StringUtilities.convertToDateTime(params[13]), XMLSchema.DATETIME));								
 						}
-						
+
 						if (!StringUtilities.convertToDateTime(params[14]).equals("0000-00-00T00:00:00")) {
 							connection.add(waveInd, vf.createIRI(baseURI + "waveEndProcessingOn"), vf.createLiteral(StringUtilities.convertToDateTime(params[14]), XMLSchema.DATETIME));								
 						}

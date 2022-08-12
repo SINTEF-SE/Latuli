@@ -147,31 +147,32 @@ public class KGGeneratorSimple {
 
 				System.out.println("\nProcessing Hub Reconstruction Locations\n");
 
-				csv2KGSimple.HubReconstructionLocations.processHubReconstructionLocationsToTSV (folder, outputFile);
+				csv2KG.HubReconstructionLocations.processSimpleHubReconstructionLocationsToTSV(folder, outputFile);
+				
 			} else if (folder.getName().startsWith("xdlu")) {		
 
 				System.out.println("\nProcessing XDocLoadingUnits\n");
 
-				csv2KGSimple.XDocLoadingUnits.processXDocLoadingUnitsToTSV (folder, outputFile);
+				csv2KG.XDocLoadingUnits.processSimpleXDocLoadingUnitsToTSV(folder, outputFile);
 
 			} else if (folder.getName().startsWith("consignments")) {
 
 				System.out.println("\nProcessing Consignments\n");
 
-				csv2KGSimple.Consignments.processConsignmentsToTSV (folder, outputFile);
+				csv2KG.Consignments.processSimpleConsignmentsToTSV(folder, outputFile);
 			}
 
 			else if (folder.getName().startsWith("parties")) {
 
 				System.out.println("\nProcessing Parties\n");
 
-				csv2KGSimple.Parties.processPartiesToTSV(folder, outputFile);
+				csv2KG.Parties.processSimplePartiesToTSV(folder, outputFile);
 
 			} else if (folder.getName().startsWith("waves")) {
 
 				System.out.println("\nProcessing Waves\n");
 
-				csv2KGSimple.Waves.processWavesToTSV (folder, outputFile);
+				csv2KG.Waves.processSimpleWavesToTSV(folder, outputFile);
 
 			} 
 		}
@@ -196,31 +197,32 @@ public class KGGeneratorSimple {
 
 				System.out.println("\nProcessing Hub Reconstruction Locations\n");
 
-				csv2KGSimple.HubReconstructionLocations.processHubReconstructionLocationsToNTriple (folder, outputFile);
+				csv2KG.HubReconstructionLocations.processSimpleHubReconstructionLocationsToNTriple(folder, outputFile);
+				
 			} else if (folder.getName().startsWith("xdlu")) {		
 
 				System.out.println("\nProcessing XDocLoadingUnits\n");
 
-				csv2KGSimple.XDocLoadingUnits.processXDocLoadingUnitsToNTriple (folder, outputFile);
+				csv2KG.XDocLoadingUnits.processSimpleXDocLoadingUnitsToNTriple(folder, outputFile);
 
 			} else if (folder.getName().startsWith("consignments")) {
 
 				System.out.println("\nProcessing Consignments\n");
 
-				csv2KGSimple.Consignments.processConsignmentsToNTriple (folder, outputFile);
+				csv2KG.Consignments.processSimpleConsignmentsToNTriple(folder, outputFile);
 			}
 
 			else if (folder.getName().startsWith("parties")) {
 
 				System.out.println("\nProcessing Parties\n");
 
-				csv2KGSimple.Parties.processPartiesToNTriple(folder, outputFile);
+				csv2KG.Parties.processSimplePartiesToNTriple(folder, outputFile);
 
 			} else if (folder.getName().startsWith("waves")) {
 
 				System.out.println("\nProcessing Waves\n");
 
-				csv2KGSimple.Waves.processWavesToNTriple (folder, outputFile);
+				csv2KG.Waves.processSimpleWavesToNTriple(folder, outputFile);
 
 			} 
 

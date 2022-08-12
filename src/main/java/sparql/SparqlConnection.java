@@ -1,4 +1,4 @@
-package sparqlconnection;
+package sparql;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,8 +10,6 @@ import org.eclipse.rdf4j.query.TupleQueryResult;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.sparql.SPARQLRepository;
-
-import sparqlquery.SparqlQuery;
 
 
 public class SparqlConnection {

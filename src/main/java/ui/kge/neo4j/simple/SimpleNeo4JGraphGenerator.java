@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class HubCentricNeo4JGraphGenerator {
+public class SimpleNeo4JGraphGenerator {
 
 	final static double CP_THRESHOLD = 0.75;
 

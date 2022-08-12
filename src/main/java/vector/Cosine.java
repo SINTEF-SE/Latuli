@@ -1,4 +1,4 @@
-package analysis;
+package vector;
 
 import java.util.ArrayList;
 
