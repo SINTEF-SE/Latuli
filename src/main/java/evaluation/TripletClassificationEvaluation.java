@@ -10,77 +10,105 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TripletClassificationEvaluation {
-	
+
 	public static void main(String[] args) throws IOException {
 
-		/** RotatE **/
-//		String neo4jDataFile = "./files/DATASETS/HubCentric/Pykeen/Rotate/neo4j_data.csv";
-//		String lowPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Rotate/df_low.csv";
-//		String highPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Rotate/df_high.csv";
-//		String evaluationFile = "./files/DATASETS/HubCentric/Pykeen/Rotate/evaluationFile.csv";		
-	
-		
-//		/** ComplEx **/
-//		String neo4jDataFile = "./files/DATASETS/HubCentric/Pykeen/Complex/neo4j_data.csv";
-//		String lowPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Complex/df_low.csv";
-//		String highPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Complex/df_high.csv";
-//		String evaluationFile = "./files/DATASETS/HubCentric/Pykeen/Complex/evaluationFile.csv";
-		
-//		/** TransE **/
-//		String neo4jDataFile = "./files/DATASETS/HubCentric/Pykeen/Transe/neo4j_data.csv";
-//		String lowPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Transe/df_low.csv";
-//		String highPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Transe/df_high.csv";
-//		String evaluationFile = "./files/DATASETS/HubCentric/Pykeen/Transe/evaluationFile.csv";
-		
-//		/** TucKER **/
-//		String neo4jDataFile = "./files/DATASETS/HubCentric/Pykeen/Tucker/neo4j_data.csv";
-//		String lowPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Tucker/df_low.csv";
-//		String highPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Tucker/df_high.csv";
-//		String evaluationFile = "./files/DATASETS/HubCentric/Pykeen/Tucker/evaluationFile.csv";
-		
-		/** ConvE **/
-		String neo4jDataFile = "./files/DATASETS/HubCentric/Pykeen/Conve/neo4j_data.csv";
-		String lowPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Conve/df_low.csv";
-		String highPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Conve/df_high.csv";
-		String evaluationFile = "./files/DATASETS/HubCentric/Pykeen/Conve/evaluationFile.csv";
-		
-		
-		constructEvaluationHubs(neo4jDataFile, lowPredictionsFile, highPredictionsFile, evaluationFile);
-		evaluate(evaluationFile);
+		//Insert which KGE model to evaluate in the kgeModel variable
+		//Options are: RotatE, ComplEx, TransE, TucKER or ConvE
+		String kgeModel = "TucKER";
+		evaluate(kgeModel);
 
 	}
-	
-	private static void evaluate(String inputEvaluationFile) throws IOException {
+
+	private static void evaluate(String kgeModel) throws IOException {
+				
+		String neo4jDataFile = null;
+		String lowPredictionsFile = null;
+		String highPredictionsFile = null;
+		String evaluationFile = null;
+
+		switch(kgeModel) {
+
+		case "RotatE":
+			neo4jDataFile = "./files/DATASETS/HubCentric/Pykeen/Rotate/neo4j_data.csv";
+			lowPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Rotate/df_low.csv";
+			highPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Rotate/df_high.csv";
+			evaluationFile = "./files/DATASETS/HubCentric/Pykeen/Rotate/evaluationFile.csv";	
+			constructEvaluationHubs(neo4jDataFile, lowPredictionsFile, highPredictionsFile, evaluationFile);
+			//evaluate(evaluationFile);
+			break;
+		
+		case "ComplEx":
+			neo4jDataFile = "./files/DATASETS/HubCentric/Pykeen/Complex/neo4j_data.csv";
+			lowPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Complex/df_low.csv";
+			highPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Complex/df_high.csv";
+			evaluationFile = "./files/DATASETS/HubCentric/Pykeen/Complex/evaluationFile.csv";
+			constructEvaluationHubs(neo4jDataFile, lowPredictionsFile, highPredictionsFile, evaluationFile);
+			//evaluate(evaluationFile);
+			break;
+		
+		case "TransE":
+			neo4jDataFile = "./files/DATASETS/HubCentric/Pykeen/Transe/neo4j_data.csv";
+			lowPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Transe/df_low.csv";
+			highPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Transe/df_high.csv";
+			evaluationFile = "./files/DATASETS/HubCentric/Pykeen/Transe/evaluationFile.csv";
+			constructEvaluationHubs(neo4jDataFile, lowPredictionsFile, highPredictionsFile, evaluationFile);
+			//evaluate(evaluationFile);
+			break;
+		
+		case "TucKER":
+			neo4jDataFile = "./files/DATASETS/HubCentric/Pykeen/Tucker/neo4j_data.csv";
+			lowPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Tucker/df_low.csv";
+			highPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Tucker/df_high.csv";
+			evaluationFile = "./files/DATASETS/HubCentric/Pykeen/Tucker/evaluationFile.csv";
+			constructEvaluationHubs(neo4jDataFile, lowPredictionsFile, highPredictionsFile, evaluationFile);
+			//evaluate(evaluationFile);
+			break;
+		
+		case "ConvE":
+			neo4jDataFile = "./files/DATASETS/HubCentric/Pykeen/Conve/neo4j_data.csv";
+			lowPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Conve/df_low.csv";
+			highPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Conve/df_high.csv";
+			evaluationFile = "./files/DATASETS/HubCentric/Pykeen/Conve/evaluationFile.csv";
+			constructEvaluationHubs(neo4jDataFile, lowPredictionsFile, highPredictionsFile, evaluationFile);
+			//evaluate(evaluationFile);
+			break;
+		}
+		System.out.println("Knowledge Graph Embedding Model evaluated: " + kgeModel);
+		System.out.println("Evaluation File stored at: " + evaluationFile);
+		
+		//String inputEvaluationFile = evaluationFile;
+		
 
 		BufferedReader evaluationFile_br = null;
 		String[] params = null;
 		String line = null;
 
 		try {
-			evaluationFile_br = new BufferedReader(new FileReader(inputEvaluationFile));
+			evaluationFile_br = new BufferedReader(new FileReader(evaluationFile));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-		
+
 
 		int total = 0;
 		int numCorrect = 0;
 		int numIncorrect = 0;
-		
+
 		List<EvaluatedHub> incorrectHubs = new ArrayList<EvaluatedHub>();
 		EvaluatedHub incorrectHub = null;
-		
+
 		try {
 			while ((line = evaluationFile_br.readLine()) != null) {
 				total++;
 				params = line.split(",");
-				
+
 				if (params[6].equals("Y")) {
 					numCorrect++;
 
 				} else {
 					numIncorrect++;
-					
+
 					incorrectHub = new EvaluatedHub.EvaluatedHubBuilder()
 							.setHubId(params[0])
 							.setPykeenId(params[1])
@@ -91,9 +119,9 @@ public class TripletClassificationEvaluation {
 							.setCorrectPrediction(params[6])
 							.setDistance(Double.parseDouble(params[7]))
 							.build();
-					
+
 					incorrectHubs.add(incorrectHub);
-					
+
 				}
 
 			}
@@ -106,42 +134,36 @@ public class TripletClassificationEvaluation {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		System.out.println("There are " + total + " predictions");
 		System.out.println("There are " + numCorrect + " correct predictions");
 		System.out.println("There are " + numIncorrect + " false predictions");
-		System.out.println("Correct ratio: " + correctRatio(numCorrect, total));
-		System.out.println("Average distance for correct predictions: ");
-		System.out.println("Average distance for incorrect predictions: ");
-		System.out.println("Number of hub nodes with incorrect predictions: " + incorrectHubs.size());
-		System.out.println("Hub nodes with incorrect predictions: ");
-		
-		for (EvaluatedHub e : incorrectHubs) {
-			System.out.println(e.getHubId());
-		}
-		
+		System.out.println("Prediction Correctness Ratio: " + correctRatio(numCorrect, total));
+		//System.out.println("Average vector distance for correct predictions: ");
+		//System.out.println("Average vector distance for incorrect predictions: ");
+
 	}
-	
+
 	private static double correctRatio (double correct, double total) {
 		return correct / total;
 	}
-	
+
 	private static double computeDistance(double lowCapPredScore, double highCapPredScore) {
-		
+
 		double distance = 0;
-		
+
 		if (lowCapPredScore > highCapPredScore) {
 			distance = lowCapPredScore - highCapPredScore;
 		} else {
 			distance = highCapPredScore - lowCapPredScore;
 		}
-		
+
 		return distance;
-		
+
 	}
-	
+
 	private static void constructEvaluationHubs (String neo4jDataFile, String lowPredictionsFile, String highPredictionsFile, String evaluationFile) throws IOException {
-		
+
 		List<EvaluatedHub> evaluatedHubList = new ArrayList<EvaluatedHub>();
 		List<CapacityPrediction> lowCapacityPredictionsList = new ArrayList<CapacityPrediction>();
 		List<CapacityPrediction> highCapacityPredictionsList = new ArrayList<CapacityPrediction>();
@@ -288,9 +310,9 @@ public class TripletClassificationEvaluation {
 			}
 
 		}
-		
+
 		List<EvaluatedHub> complete_ehList = new ArrayList<EvaluatedHub>();
-		
+
 		EvaluatedHub eh = null;
 
 		double lowPredictionScore;
@@ -298,26 +320,26 @@ public class TripletClassificationEvaluation {
 		double relativeToMaxCapacity;
 		String correctPrediction = null;
 		double distance;
-		
+
 		for (EvaluatedHub e : hub_low_high_list) {
-			
+
 			lowPredictionScore = e.getLowPredictionScore();
 			highPredictionScore = e.getHighPredictionScore();
 			relativeToMaxCapacity = e.getRelativeToMaxCapacity();
-			
+
 			if (lowPredictionScore > highPredictionScore && relativeToMaxCapacity >= 0.75) {
 				correctPrediction = "Y";
-				
+
 			} else if (highPredictionScore > lowPredictionScore && relativeToMaxCapacity < 0.75) {
 				correctPrediction = "Y";
-				
+
 			} else {
-				
+
 				correctPrediction = "N";
 			}
-			
+
 			distance = computeDistance(lowPredictionScore, highPredictionScore);
-			
+
 			eh = new EvaluatedHub.EvaluatedHubBuilder()
 					.setHubId(e.getHubId())
 					.setPykeenId(e.getPykeenId())
@@ -330,7 +352,7 @@ public class TripletClassificationEvaluation {
 					.build();
 
 			complete_ehList.add(eh);
-			
+
 		}
 
 		BufferedWriter hub_br = null;	
@@ -357,7 +379,7 @@ public class TripletClassificationEvaluation {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
 
@@ -510,12 +532,12 @@ public class TripletClassificationEvaluation {
 				this.lowPredictionScore = lowPredictionScore;
 				return this;
 			}
-			
+
 			public EvaluatedHubBuilder setCorrectPrediction(String correctPrediction) {
 				this.correctPrediction = correctPrediction;
 				return this;
 			}
-			
+
 			public EvaluatedHubBuilder setDistance(double distance) {
 				this.distance = distance;
 				return this;
@@ -554,7 +576,7 @@ public class TripletClassificationEvaluation {
 		public String getCorrectPrediction() {
 			return correctPrediction;
 		}
-		
+
 		public double getDistance() {
 			return distance;
 		}
