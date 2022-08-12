@@ -1,6 +1,7 @@
 files/
 target/
 .DS_Store
+.classpath
 ontology/
 http/
 /bin/
