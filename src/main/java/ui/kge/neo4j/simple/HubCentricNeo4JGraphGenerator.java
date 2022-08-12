@@ -1,4 +1,4 @@
-package ui.neo4j.hubcentric;
+package ui.kge.neo4j.simple;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

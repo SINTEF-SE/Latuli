@@ -43,7 +43,6 @@ public class SparqlConnection {
 				counter++;
 				BindingSet solution = result.next();
 
-
 			}
 			
 			System.out.println("Number of results: " + counter);
@@ -52,8 +51,6 @@ public class SparqlConnection {
 			e.printStackTrace();
 		}
 	}
-
-
 
 
 	public static TupleQuery connect (Repository repository, String strQuery) {

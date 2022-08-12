@@ -1,4 +1,4 @@
-package evaluation;
+package ui.kge.evaluation;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

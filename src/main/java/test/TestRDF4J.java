@@ -13,7 +13,8 @@ import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.http.HTTPRepository;
 
 
-public class RDF4J {
+//Test adding triplets from CSV into RDF4J triple store
+public class TestRDF4J {
 
 	public static void main(String[] args) {
 

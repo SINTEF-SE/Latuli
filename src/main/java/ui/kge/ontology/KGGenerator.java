@@ -1,4 +1,4 @@
-package ui.rdf2vec;
+package ui.kge.ontology;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,9 +13,21 @@ import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Stopwatch;
+
+import csv2KG.Consignments;
+import csv2KG.DangerousGoods;
+import csv2KG.HubReconstructionLocations;
+import csv2KG.LoadingUnits;
+import csv2KG.Parties;
+import csv2KG.ShipmentItems;
+import csv2KG.Shipments;
+import csv2KG.TradeItems;
+import csv2KG.Transports;
+import csv2KG.Waves;
+import csv2KG.XDocLoadingUnits;
 import csvfiltering.CSVProcessor;
 
-public class KGGeneratorSimple {
+public class KGGenerator {
 
 	public static void main(String[] args) {
 
@@ -79,6 +91,7 @@ public class KGGeneratorSimple {
 		try {
 			list = CSVProcessor.createFileList(csvSource);
 		} catch (IOException e1) {
+			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 
@@ -103,10 +116,10 @@ public class KGGeneratorSimple {
 
 		if (fileFormat.equals("1")) {
 			System.out.println("Creating the knowledge graph and storing the KG file as " + kg + "/KG.tsv");
-			createFullDatasetToTSV(tmpSplitFilesFiltered, kg + "/KG_simple.tsv");
+			createFullDatasetToTSV(tmpSplitFilesFiltered, kg + "/KG.tsv");
 		} else {
 			System.out.println("Creating the knowledge graph and storing the KG file as " + kg + "/KG.nt");
-			createFullDatasetToNTriples(tmpSplitFilesFiltered, kg + "/KG_simple.nt");	
+			createFullDatasetToNTriples(tmpSplitFilesFiltered, kg + "/KG.nt");	
 		}
 
 		//remove tmp folders after KG file generation
@@ -142,38 +155,74 @@ public class KGGeneratorSimple {
 		File[] files = parentFolder.listFiles();
 
 		for (File folder : files) {
-			
-			if (folder.getName().startsWith("hubreconstructionlocations")) {
 
-				System.out.println("\nProcessing Hub Reconstruction Locations\n");
-
-				csv2KGSimple.HubReconstructionLocations.processHubReconstructionLocationsToTSV (folder, outputFile);
-			} else if (folder.getName().startsWith("xdlu")) {		
+			if (folder.getName().startsWith("xdlu")) {		
 
 				System.out.println("\nProcessing XDocLoadingUnits\n");
 
-				csv2KGSimple.XDocLoadingUnits.processXDocLoadingUnitsToTSV (folder, outputFile);
+				XDocLoadingUnits.processXDocLoadingUnitsToTSV (folder, outputFile);
 
 			} else if (folder.getName().startsWith("consignments")) {
 
 				System.out.println("\nProcessing Consignments\n");
 
-				csv2KGSimple.Consignments.processConsignmentsToTSV (folder, outputFile);
+				Consignments.processConsignmentsToTSV (folder, outputFile);
 			}
 
 			else if (folder.getName().startsWith("parties")) {
 
 				System.out.println("\nProcessing Parties\n");
 
-				csv2KGSimple.Parties.processPartiesToTSV(folder, outputFile);
+				Parties.processPartiesToTSV(folder, outputFile);
+
+			} else if (folder.getName().startsWith("dgr")) {
+
+				System.out.println("\nProcessing Dangerous Goods\n");
+
+				DangerousGoods.processDangerousGoodsToTSV (folder, outputFile);
+
+			} else if (folder.getName().startsWith("shipmentitems")) {
+
+				System.out.println("\nProcessing Shipment Items\n");
+
+				ShipmentItems.processShipmentItemsToTSV (folder, outputFile);
+
+			} else if (folder.getName().startsWith("shipments")) {
+
+				System.out.println("\nProcessing Shipments\n");
+
+				Shipments.processShipmentsToTSV (folder, outputFile);
 
 			} else if (folder.getName().startsWith("waves")) {
 
 				System.out.println("\nProcessing Waves\n");
 
-				csv2KGSimple.Waves.processWavesToTSV (folder, outputFile);
+				Waves.processWavesToTSV (folder, outputFile);
 
-			} 
+			} else if (folder.getName().startsWith("tradeitems")) {
+
+				System.out.println("\nProcessing Trade Items\n");
+
+				TradeItems.processTradeItemsToTSV (folder, outputFile);
+
+			} else if (folder.getName().startsWith("transports")) {
+
+				System.out.println("\nProcessing Transports\n");
+
+				Transports.processTransportsToTSV (folder, outputFile);
+
+			} else if (folder.getName().startsWith("loadingunits")) {
+
+				System.out.println("\nProcessing Loading Units\n");
+
+				LoadingUnits.processLoadingUnitsToTSV (folder, outputFile);
+
+			} else if (folder.getName().startsWith("hubreconstructionlocations")) {
+
+				System.out.println("\nProcessing Hub Reconstruction Locations\n");
+
+				HubReconstructionLocations.processHubReconstructionLocationsToTSV (folder, outputFile);
+			}
 		}
 	}
 
@@ -191,38 +240,74 @@ public class KGGeneratorSimple {
 		File[] files = parentFolder.listFiles();
 
 		for (File folder : files) {
-			
-			if (folder.getName().startsWith("hubreconstructionlocations")) {
 
-				System.out.println("\nProcessing Hub Reconstruction Locations\n");
-
-				csv2KGSimple.HubReconstructionLocations.processHubReconstructionLocationsToNTriple (folder, outputFile);
-			} else if (folder.getName().startsWith("xdlu")) {		
+			if (folder.getName().startsWith("xdlu")) {		
 
 				System.out.println("\nProcessing XDocLoadingUnits\n");
 
-				csv2KGSimple.XDocLoadingUnits.processXDocLoadingUnitsToNTriple (folder, outputFile);
+				XDocLoadingUnits.processXDocLoadingUnitsToNTriple (folder, outputFile);
 
 			} else if (folder.getName().startsWith("consignments")) {
 
 				System.out.println("\nProcessing Consignments\n");
 
-				csv2KGSimple.Consignments.processConsignmentsToNTriple (folder, outputFile);
+				Consignments.processConsignmentsToNTriple (folder, outputFile);
 			}
 
 			else if (folder.getName().startsWith("parties")) {
 
 				System.out.println("\nProcessing Parties\n");
 
-				csv2KGSimple.Parties.processPartiesToNTriple(folder, outputFile);
+				Parties.processPartiesToNTriple(folder, outputFile);
+
+			} else if (folder.getName().startsWith("dgr")) {
+
+				System.out.println("\nProcessing Dangerous Goods\n");
+
+				DangerousGoods.processDangerousGoodsToNTriple (folder, outputFile);
+
+			} else if (folder.getName().startsWith("shipmentitems")) {
+
+				System.out.println("\nProcessing Shipment Items\n");
+
+				ShipmentItems.processShipmentItemsToNTriple (folder, outputFile);
+
+			} else if (folder.getName().startsWith("shipments")) {
+
+				System.out.println("\nProcessing Shipments\n");
+
+				Shipments.processShipmentsToNTriple (folder, outputFile);
 
 			} else if (folder.getName().startsWith("waves")) {
 
 				System.out.println("\nProcessing Waves\n");
 
-				csv2KGSimple.Waves.processWavesToNTriple (folder, outputFile);
+				Waves.processWavesToNTriple (folder, outputFile);
 
-			} 
+			} else if (folder.getName().startsWith("tradeitems")) {
+
+				System.out.println("\nProcessing Trade Items\n");
+
+				TradeItems.processTradeItemsToNTriple (folder, outputFile);
+
+			} else if (folder.getName().startsWith("transports")) {
+
+				System.out.println("\nProcessing Transports\n");
+
+				Transports.processTransportsToNTriple (folder, outputFile);
+
+			} else if (folder.getName().startsWith("loadingunits")) {
+
+				System.out.println("\nProcessing Loading Units\n");
+
+				LoadingUnits.processLoadingUnitsToNTriple (folder, outputFile);
+
+			} else if (folder.getName().startsWith("hubreconstructionlocations")) {
+
+				System.out.println("\nProcessing Hub Reconstruction Locations\n");
+
+				HubReconstructionLocations.processHubReconstructionLocationsToNTriple (folder, outputFile);
+			}
 
 		}
 
