@@ -35,77 +35,6 @@ import com.opencsv.CSVWriter;
 import utilities.StringUtilities;
 
 public class CSVProcessor {
-
-	public static void main(String[] args) throws ParseException, IOException {
-
-		//		String startDateTime = "2019-12-01"; String endDateTime = "2019-12-31";
-		//		String sourceFolder = "./files/CSV/Audun/_ORIGINAL_CSV/"; 
-		//		String tmpSplitFiles = "./files/output/"; 
-		//		String tmpSplitFilesFiltered = "./files/CSV/Audun/_FILTER_PERIOD_"+startDateTime+"_"+endDateTime+"/"; 
-		//		String targetFolderFile = "./files/CSV/Audun/csv_target_folders.txt";
-		//		filterOnPeriod(startDateTime, endDateTime, sourceFolder, tmpSplitFilesFiltered);
-		//
-		//		String csvSourceFolder = "./files/ORIGINAL_CSV/"; 
-		//		File output = new File(tmpSplitFiles);
-		//
-		//		if (!output.exists()) { output.mkdir(); }
-		//
-		//		List<File> list = createFileList(csvSourceFolder);
-		//
-		//		for (File file : list) { 
-		//			System.out.println("Processing file: " + file.getName()); 
-		//			splitCSV(file.getPath(), tmpSplitFiles, 50); 
-		//		}
-		//
-		//
-		//		//test join files
-		//		File outputFile = new File("./files/out/test.csv");
-		//		File folder = new File ("./files/CSV/Audun/FILTER_PERIOD_1_6_2020/consignments_split_filtered");
-		//
-		//		joinFiles(folder, outputFile);
-		//
-		//		removeFirstLineFromFilesInFolder("./files/DATASETS/NEW_3M_DATASET");
-
-		//StringUtilities.addCoordinatesToParties("./files/DATASETS/NEW_3M_DATASET/parties.csv", "./files/DATASETS/ORIGINAL_CSV/parties.csv", "./files/DATASETS/NEW_3M_DATASET/partiesWCoordinates.csv");
-
-//		String csvFileIn = "./files/DATASETS/2019_2022_OUT/consignments.csv";
-//		String csvFileOut = "./files/DATASETS/FilteredByColumns/consignments.csv";
-//		List<Integer> consignmentColumns = new LinkedList<Integer>(Arrays.asList(0,18,23,32,33,34,35,36,40,41));
-//
-//
-//		filterCSVByColumns(csvFileIn, csvFileOut, consignmentColumns);
-		
-		
-		
-		String date = "2023-04-27 22:50:01.0270000";
-		
-		System.out.println("Is this a date? " + isDate(date));
-		
-		//2019-10-26T13:33
-		//2018-05-10T12:30
-		
-//		String newDate;
-//		if (date.startsWith("2019") || date.startsWith("2020") || date.startsWith("2021") || date.startsWith("2022")) {
-//			System.out.println("This is a date");
-//			newDate = StringUtilities.convertToDateTime(date);
-//		} else {
-//			System.out.println("This is not a date");
-//			newDate = date;
-//		}
-//		
-//		System.out.println(newDate);
-				
-				
-		//"^\\d{4}-\\d{2}-\\d{2}"		
-		
-		//convertDate(date);
-		
-		//correctDateTime("./files/DATASETS/FilteredByColumns/consignments.csv");
-
-	}
-	
-
-
 	
 	private static boolean isDate (String input) {
 		
@@ -1089,7 +1018,6 @@ public class CSVProcessor {
 			}
 			try {
 				bw = new BufferedWriter(new FileWriter(filteredFolder + "/" + filesInDir[i].getName() + "_filtered"));
-				System.out.println("filterWaves: printing to " + filteredFolder + "/" + filesInDir[i].getName() + "_filtered");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -1147,10 +1075,7 @@ public class CSVProcessor {
 				e.printStackTrace();
 			}
 			try {
-				
-				System.out.println("filterHubReconstructionLocations: Reading file: " + filesInDir[i].getName());
-				System.out.println("filterHubReconstructionLocations: Trying to print file:" + filteredFolder + "/" + filesInDir[i].getName() + "_filtered");
-				
+
 				bw = new BufferedWriter(new FileWriter(filteredFolder + "/" + filesInDir[i].getName() + "_filtered"));
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -1272,8 +1197,6 @@ public class CSVProcessor {
 
 			String line;		
 
-			//System.out.println("Filtering file: " + filesInDir[i].getPath());
-
 			try {
 				br = new BufferedReader(new FileReader(filesInDir[i]));
 			} catch (FileNotFoundException e) {
@@ -1321,7 +1244,6 @@ public class CSVProcessor {
 
 	private static void filterXDocLoadingUnitsOnHub (int csvFieldNumber, String hub, String inputFolder, String filteredFolder) throws ParseException {
 
-		//FIXME: Probably a more elegant way of creating a folder if it doesn´t exist
 		File outputFolder = new File(filteredFolder);
 
 		if (!outputFolder.exists()) {
@@ -1446,8 +1368,6 @@ public class CSVProcessor {
 				e.printStackTrace();
 			}
 			
-			//System.out.println("There are " + shipmentIds.size() + " relevant shipment ids");
-
 
 		}
 
