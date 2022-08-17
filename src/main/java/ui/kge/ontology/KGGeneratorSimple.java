@@ -20,37 +20,44 @@ public class KGGeneratorSimple {
 	public static void main(String[] args) {
 
 		Stopwatch stopwatch = Stopwatch.createStarted();
-
-		Scanner input = new Scanner(System.in);
-
-		System.out.println("Would you like the knowledge graph as TSV (1) or N-Triples (2)?");
-		String fileFormat = input.nextLine();
-
-		System.out.println("Enter start datetime (yyyy-MM-dd'T'HH:mm:ss): "); 
-		String startDateTime = input.nextLine();
-
-		System.out.println("\nEnter end datetime (yyyy-MM-dd'T'HH:mm:ss): "); 
-		String endDateTime = input.nextLine();
-
-		System.out.println("\nEnter existing source folder for CSV files: "); 
-		String csvSource = input.nextLine();
 		
-		System.out.println("\nDo your CSV files contain a header (Y or N)?: "); 
-		String header = input.nextLine();
+		String fileFormat = "1";
+		String startDateTime = "2020-06-01T00:00:00";
+		String endDateTime = "2020-10-01T00:00:00";
+		String csvSource = "./files/DATASETS/ORIGINAL_CSV";
+		String kg = "./files/KG";
 		
-		if (header.equalsIgnoreCase("Y")) {
-			try {
-				System.out.println("Removing the header from all CSV files...");
-				CSVProcessor.removeFirstLineFromFilesInFolder(csvSource);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
 
-		System.out.println("\nEnter name of new folder where the generated knowledge graph will be stored:");
-		String kg = input.nextLine();
-
-		input.close(); 
+//		Scanner input = new Scanner(System.in);
+//
+//		System.out.println("Would you like the knowledge graph as TSV (1) or N-Triples (2)?");
+//		String fileFormat = input.nextLine();
+//
+//		System.out.println("Enter start datetime (yyyy-MM-dd'T'HH:mm:ss): "); 
+//		String startDateTime = input.nextLine();
+//
+//		System.out.println("\nEnter end datetime (yyyy-MM-dd'T'HH:mm:ss): "); 
+//		String endDateTime = input.nextLine();
+//
+//		System.out.println("\nEnter existing source folder for CSV files: "); 
+//		String csvSource = input.nextLine();
+//		
+//		System.out.println("\nDo your CSV files contain a header (Y or N)?: "); 
+//		String header = input.nextLine();
+//		
+//		if (header.equalsIgnoreCase("Y")) {
+//			try {
+//				System.out.println("Removing the header from all CSV files...");
+//				CSVProcessor.removeFirstLineFromFilesInFolder(csvSource);
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//
+//		System.out.println("\nEnter name of new folder where the generated knowledge graph will be stored:");
+//		String kg = input.nextLine();
+//
+//		input.close(); 
 
 		System.out.println("\nThis process may take several minutes to complete...");	  
 
