@@ -27,8 +27,8 @@ public class TripletClassificationEvaluation {
 
 		List<HubData> aggregatedHubThroughputData = SimpleNeo4JGraphGenerator.aggregateHubThroughputData (maxFile, wavesFile, xdluFile, 0.75);
 
-		String correctCSV = "./files/EvaluationRotate/HubdataCorrectNew.csv";
-		String incorrectCSV = "./files/EvaluationRotate/HubdataIncorrectNew.csv";
+		String correctCSV = "./files/EVALUATION/EvaluationRotate/HubdataCorrect.csv";
+		String incorrectCSV = "./files/EVALUATION/EvaluationRotate/HubdataIncorrect.csv";
 
 		evaluate(kgeModel, aggregatedHubThroughputData, correctCSV, incorrectCSV);
 

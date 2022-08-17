@@ -20,28 +20,33 @@ import com.google.common.base.Stopwatch;
 import csvfiltering.CSVProcessor;
 import datavalidation.Validation;
 
-public class Neo4JNodesGenerator {
+public class Neo4JGraphNodesGenerator {
 
 	//test method
 	public static void main(String[] args) throws IOException {
 
-
 		Stopwatch stopwatch = Stopwatch.createStarted();
 		
+		//the lists include the columns extracted from the corresponding csv files
 		List<Integer> xDocLoadingUnitColumns = new LinkedList<Integer>(Arrays.asList(0,1,2,3,5,6,7,11,12,18,36,37,40,41,42));
 		List<Integer> consignmentColumns = new LinkedList<Integer>(Arrays.asList(0,18,23,32,33,34,35,36,40,41));
 		List<Integer> shipmentColumns = new LinkedList<Integer>(Arrays.asList(0,3,18,19));
 		List<Integer> shipmentItemsColumns = new LinkedList<Integer>(Arrays.asList(0,1,2,3,4));
 		List<Integer> loadingUnitColumns = new LinkedList<Integer>(Arrays.asList(0,1,2,3));
 		List<Integer> waveColumns = new LinkedList<Integer>(Arrays.asList(0,1,2,4,8,9,10,12,13,14,15,16,17,18,19,20,21));
+
+		String dataset = "2020_2022";
 		
+		//set the time period for which the Neo4J graph will be created (needs to be within the time period of the dataset)
 		String startDateTime = "2021-01-01T10:00:00";
 		String endDateTime = "2022-05-01T10:00:00";
-		String csvSource = "./files/DATASETS/2020_2022";
-		//if there are headers in the csv files
+		
+		String csvSource = "./files/DATASETS/CompleteNeo4JGraph/"+dataset;
+		String csvOutput = "./files/DATASETS/CompleteNeo4JGraph/"+dataset+"_FilteredByColumns";
+		
+		//if there are headers in the csv files they should be removed
 		System.out.println("Removing headers...");
-		CSVProcessor.removeFirstLineFromFilesInFolder(csvSource);
-		String csvOutput = "./files/DATASETS/2020_2022_FilteredByColumns";
+		CSVProcessor.removeFirstLineFromFilesInFolder(csvSource);		
 
 		System.out.println("\nThis process may take several minutes to complete...");	  
 
@@ -144,6 +149,7 @@ public class Neo4JNodesGenerator {
 			e.printStackTrace();
 		}
 		
+		//clean/validate the csv files (remove null values etc.) 
 		System.out.println("Validating complete CSV files...");
 		String inputConsignmentCSV = csvOutput + "/consignments.csv";
 		String inputShipmentsCSV = csvOutput + "/shipments.csv";
@@ -168,6 +174,7 @@ public class Neo4JNodesGenerator {
 
 		stopwatch.stop();
 
+		System.out.println("The files to import into Neo4J are the ones appended with \"_validated\"");
 		System.out.println("The generation of CSV files for Neo4J import took: " + stopwatch.elapsed(TimeUnit.MINUTES) + " minutes.");
 
 	}
@@ -187,7 +194,6 @@ public class Neo4JNodesGenerator {
 				//if only one file, have the name of the file be filename until '_'
 				for (File sf : singleFiles) {
 					FileUtils.copyFile(sf, new File(joinedCSVOutputFolder + "/" + sf.getName().substring(0, sf.getName().indexOf("_")) + ".csv"));
-//					FileUtils.copyFile(sf, new File(joinedCSVOutputFolder + "/" + sf.getName() + ".csv"));
 				}
 			} else if (!f.getName().endsWith("_ids")) {
 				System.out.println("Processing folder " + f.getName() + " with number of files: " + f.listFiles().length);

@@ -7,22 +7,29 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class Neo4JRelationshipsGenerator {
+public class Neo4JGraphRelationshipsGenerator {
 	
+	//test method
 	public static void main(String[] args) {
 		
-		String consignmentCSV = "./files/DATASETS/2020_2022_FilteredByColumns/consignments_validated.csv";
-		String shipmentItemCSV = "./files/DATASETS/2020_2022_FilteredByColumns/shipmentitems_validated.csv";
-		String xdluCSV = "./files/DATASETS/2020_2022_FilteredByColumns/xdlu_validated.csv";
+		String dataset = "2020_2022";
 		
-		String CONSIGNMENT_INCLUDED_IN_WAVE = "./files/DATASETS/Relationships/CONSIGNMENT_INCLUDED_IN_WAVE.csv";
-		String SHIPMENT_ITEM_IN_SHIPMENT = "./files/DATASETS/Relationships/SHIPMENT_ITEM_IN_SHIPMENT.csv";
-		String SHIPMENT_ITEM_INCLUDES_LOADING_UNIT = "./files/DATASETS/Relationships/SHIPMENT_ITEM_INCLUDES_LOADING_UNIT.csv";
-		String XDLU_INCLUDED_IN_WAVE = "./files/DATASETS/Relationships/XDLU_INCLUDED_IN_WAVE.csv";
-		String XDLU_PROCESSED_BY_HUB = "./files/DATASETS/Relationships/XDLU_PROCESSED_BY_HUB.csv";
-		String XDLU_INCLUDES_OUTBOUND_CONSIGNMENT = "./files/DATASETS/Relationships/XDLU_INCLUDES_OUTBOUND_CONSIGNMENT.csv";
-		String XDLU_INCLUDES_INBOUND_CONSIGNMENT = "./files/DATASETS/Relationships/XDLU_INCLUDES_INBOUND_CONSIGNMENT.csv";
-		String XDLU_LOADING_UNIT = "./files/DATASETS/Relationships/XDLU_LOADING_UNIT.csv";
+		//input
+		String consignmentCSV = "./files/DATASETS/CompleteNeo4JGraph/"+dataset+"_FilteredByColumns/consignments_validated.csv";
+		String shipmentItemCSV = "./files/DATASETS/CompleteNeo4JGraph/"+dataset+"_FilteredByColumns/shipmentitems_validated.csv";
+		String xdluCSV = "./files/DATASETS/CompleteNeo4JGraph/"+dataset+"_FilteredByColumns/xdlu_validated.csv";
+		
+		//output
+		String CONSIGNMENT_INCLUDED_IN_WAVE = "./files/DATASETS/CompleteNeo4JGraph/"+dataset+"_Relationships/CONSIGNMENT_INCLUDED_IN_WAVE.csv";
+		String SHIPMENT_ITEM_IN_SHIPMENT = "./files/DATASETS/CompleteNeo4JGraph/"+dataset+"_Relationships/SHIPMENT_ITEM_IN_SHIPMENT.csv";
+		String SHIPMENT_ITEM_INCLUDES_LOADING_UNIT = "./files/DATASETS/CompleteNeo4JGraph/"+dataset+"_Relationships/SHIPMENT_ITEM_INCLUDES_LOADING_UNIT.csv";
+		String XDLU_INCLUDED_IN_WAVE = "./files/DATASETS/CompleteNeo4JGraph/"+dataset+"_Relationships/XDLU_INCLUDED_IN_WAVE.csv";
+		String XDLU_PROCESSED_BY_HUB = "./files/DATASETS/CompleteNeo4JGraph/"+dataset+"_Relationships/XDLU_PROCESSED_BY_HUB.csv";
+		String XDLU_INCLUDES_OUTBOUND_CONSIGNMENT = "./files/DATASETS/CompleteNeo4JGraph/"+dataset+"_Relationships/XDLU_INCLUDES_OUTBOUND_CONSIGNMENT.csv";
+		String XDLU_INCLUDES_INBOUND_CONSIGNMENT = "./files/DATASETS/CompleteNeo4JGraph/"+dataset+"_Relationships/XDLU_INCLUDES_INBOUND_CONSIGNMENT.csv";
+		String XDLU_LOADING_UNIT = "./files/DATASETS/CompleteNeo4JGraph/"+dataset+"_Relationships/XDLU_LOADING_UNIT.csv";
+		
+		System.out.println("Creating Neo4J relationships...");
 		
 		generateConsignmentIncludedInWaveRel(consignmentCSV, CONSIGNMENT_INCLUDED_IN_WAVE);
 		generateShipmentItemInShipmentRel(shipmentItemCSV, SHIPMENT_ITEM_IN_SHIPMENT);
@@ -33,6 +40,7 @@ public class Neo4JRelationshipsGenerator {
 		generateXdluIncludesInboundConsignmentRel(xdluCSV, XDLU_INCLUDES_INBOUND_CONSIGNMENT);
 		generateXdluLoadingUnitRel(xdluCSV, XDLU_LOADING_UNIT);
 		
+		System.out.println("Neo4J relationships created and stored as csv files in folder " + "./files/DATASETS/CompleteNeo4JGraph/"+dataset+"_Relationships");
 	}
 	
 	public static void generateConsignmentIncludedInWaveRel (String consignmentCSV, String CONSIGNMENT_INCLUDED_IN_WAVE) {

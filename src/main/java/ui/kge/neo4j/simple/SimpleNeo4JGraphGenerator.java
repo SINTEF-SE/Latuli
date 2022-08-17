@@ -16,11 +16,12 @@ public class SimpleNeo4JGraphGenerator {
 
 	final static double CP_THRESHOLD = 0.75;
 
+	//test method
 	public static void main(String[] args) throws IOException, ParseException {
 
-		String maxFile = "./files/DATASETS/HubCentric/max.csv";
-		String wavesFile = "./files/DATASETS/HubCentric/waves.csv";
-		String xdluFile = "./files/DATASETS/HubCentric/xdlu.csv";
+		String maxFile = "./files/DATASETS/SimpleNeo4JGraph/max.csv";
+		String wavesFile = "./files/DATASETS/SimpleNeo4JGraph/waves.csv";
+		String xdluFile = "./files/DATASETS/SimpleNeo4JGraph/xdlu.csv";
 
 		String trainingFromDate = "2020-01-01";
 		String trainingToDate = "2021-12-31";
@@ -49,10 +50,10 @@ public class SimpleNeo4JGraphGenerator {
 		List<HubData> completeList = createCompleteHubDataList(aggregateAll, CP_THRESHOLD);
 
 		//print to different csv files
-		String hub_csv = "./files/DATASETS/HubCentric/Nodes/Hub.csv";
+		String hub_csv = "./files/DATASETS/SimpleNeo4JGraph/Nodes/Hub.csv";
 
-		String hasThroughput_csv = "./files/DATASETS/HubCentric/Relationships/hasThroughput.csv";
-		String hasCapacityPrediction_csv = "./files/DATASETS/HubCentric/Relationships/hasCapacityPrediction.csv";
+		String hasThroughput_csv = "./files/DATASETS/SimpleNeo4JGraph/Relationships/hasThroughput.csv";
+		String hasCapacityPrediction_csv = "./files/DATASETS/SimpleNeo4JGraph/Relationships/hasCapacityPrediction.csv";
 
 
 		BufferedWriter hub_br = null;		
