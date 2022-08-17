@@ -109,18 +109,18 @@ public class KGGeneratorSimple {
 			createFullDatasetToNTriples(tmpSplitFilesFiltered, kg + "/KG_simple.nt");	
 		}
 
-		//remove tmp folders after KG file generation
-		try {
-			deleteFolder(tmpSplitFilesFolder.toPath());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		try {
-			deleteFolder(tmpSplitFilesFilteredFolder.toPath());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		//remove tmp folders after KG file generation
+//		try {
+//			deleteFolder(tmpSplitFilesFolder.toPath());
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//
+//		try {
+//			deleteFolder(tmpSplitFilesFilteredFolder.toPath());
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 
 		stopwatch.stop();
 		System.out.println("The knowledge graph generation process took: " + stopwatch.elapsed(TimeUnit.MINUTES) + " minutes.");

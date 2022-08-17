@@ -21,32 +21,32 @@ public class SimpleNeo4JGraphGenerator {
 		String maxFile = "./files/DATASETS/HubCentric/max.csv";
 		String wavesFile = "./files/DATASETS/HubCentric/waves.csv";
 		String xdluFile = "./files/DATASETS/HubCentric/xdlu.csv";
-		
+
 		String trainingFromDate = "2020-01-01";
 		String trainingToDate = "2021-12-31";
 		String testFromDate = "2022-01-01";
 		String testToDate = "2022-05-01";
-		
+
 		createKnowledgeGraph(maxFile, wavesFile, xdluFile, trainingFromDate, trainingToDate, testFromDate, testToDate);
 
 	}
-
+	
 	public static void createKnowledgeGraph (String maxFile, String wavesFile, String xdluFile, String trainingFrom, String trainingTo, String testFrom, String testTo) throws ParseException, IOException {
 
 		//get data from waves
-		List<HubData> wavesHubDataList = aggregateWaveData(wavesFile);
+		List<HubData> wavesHubDataList = collectWaveData(wavesFile);
 
 		//get data from xdlus
-		List<HubData> xdluHubDataList = aggregateXDLUData(xdluFile);
+		List<HubData> xdluHubDataList = collectXDLUData(xdluFile);
 
 		//get max data
-		List<HubData> maxList = aggregateMaxData(maxFile);
+		List<HubData> maxList = collectMaxData(maxFile);
 
 		//iterate all three lists and create a common list
-		List<HubData> commonList = createCommonList(wavesHubDataList, xdluHubDataList, maxList);
+		List<HubData> aggregateAll = combineWaveXDLUMaxData(wavesHubDataList, xdluHubDataList, maxList);
 
-		//compute relativeMaxCap
-		List<HubData> completeList = computeRelativeToMaxCapacity(commonList, CP_THRESHOLD);
+		//compute full list including relativeToMaxCapacity
+		List<HubData> completeList = createCompleteHubDataList(aggregateAll, CP_THRESHOLD);
 
 		//print to different csv files
 		String hub_csv = "./files/DATASETS/HubCentric/Nodes/Hub.csv";
@@ -167,8 +167,135 @@ public class SimpleNeo4JGraphGenerator {
 
 	}
 
+	//used for evaluation purposes...
+	public static List<HubData> aggregateHubThroughputData (String maxFile, String wavesFile, String xdluFile, double threshold) {
 
-	private static List<HubData> aggregateWaveData (String waves) {
+		//get data from waves
+		List<HubData> wavesHubDataList = collectWaveData(wavesFile);
+
+		//get data from xdlus
+		List<HubData> xdluHubDataList = collectXDLUData(xdluFile);
+
+		//get max data
+		List<HubData> maxList = collectMaxData(maxFile);
+
+		//iterate all three lists and create a common list
+		List<HubData> combineAll = combineWaveXDLUMaxData(wavesHubDataList, xdluHubDataList, maxList);
+
+		List<HubData> completeList = null;
+		
+		//compute full list including relativeToMaxCapacity
+		try {
+			completeList = createCompleteHubDataList(combineAll, threshold);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return completeList;
+
+	}
+	
+	private static List<HubData> createCompleteHubDataList (List<HubData> hubDataList, double CP_THRESHOLD) throws IOException {
+
+		List<HubData> fullHubDataList = new ArrayList<HubData>();
+
+		HubData fullHubData = null;
+		double relativeMax = 0;
+		double relativeMaxShipment = 0;
+		double relativeMaxVolume = 0;
+		double relativeMaxWeight = 0;
+
+		String shipmentsThroughput = null;
+		String weightThroughput = null;
+		String volumeThroughput = null;
+		String palletsThroughput = null;
+		String boxesThroughput = null;
+		String capacityPrediction = null;
+
+		//attribute to hold whether the relativeToMaxCapacity is > 0.5
+		boolean highCP = false;
+
+		//relativeMaxCapacity is computed as the average of shipments, volume and weight
+		//TODO: implement these computations in separate method
+		for (HubData hd : hubDataList) {
+
+			//tweaking these since some discrepancy in modifiedOn (waves resp xdlu) results in daily max being larger than periodic max
+			if ((double)hd.getQttShipments() > (double)hd.getMaxShipments()) {
+				relativeMaxShipment = 1;
+			} else {
+				relativeMaxShipment = (double)hd.getQttShipments() / (double)hd.getMaxShipments();
+			}
+
+			if (hd.getTotalVolume() > hd.getMaxVolume()) {
+				relativeMaxVolume = 1;
+			} else {
+				relativeMaxVolume = hd.getTotalVolume() / hd.getMaxVolume();
+			}
+
+
+			if (hd.getTotalWeight() > hd.getMaxWeight()) {
+				relativeMaxWeight = 1;
+			} else {
+				relativeMaxWeight = hd.getTotalWeight() / hd.getMaxWeight();
+			}
+
+			relativeMax = (relativeMaxShipment + relativeMaxVolume + relativeMaxWeight) / 3;
+
+			//if the relativeToMaxCapacity is below the set threshold, then highCP is true
+			if (relativeMax < CP_THRESHOLD) {
+				highCP = true;
+			} else {
+				highCP = false;
+			}
+
+			shipmentsThroughput = computeShipmentsThroughputMeasurement(hd.getMaxShipments(), hd.getQttShipments(), CP_THRESHOLD);
+			weightThroughput = computeWeightThroughputMeasurement(hd.getMaxWeight(), hd.getTotalWeight(), CP_THRESHOLD);
+			volumeThroughput = computeVolumeThroughputMeasurement(hd.getMaxVolume(), hd.getTotalVolume(), CP_THRESHOLD);
+			palletsThroughput = computePalletsThroughputMeasurement(hd.getMaxPallets(), hd.getQttPalletsBuilt(), CP_THRESHOLD);
+			boxesThroughput = computeBoxesThroughputMeasurement(hd.getMaxBoxes(), hd.getQttBoxesProcessed(), CP_THRESHOLD);
+
+			if (highCP) {
+				capacityPrediction = "HighCapacityPrediction";
+			} else {
+				capacityPrediction = "LowCapacityPrediction";
+			}
+
+
+			fullHubData = new HubData.HubDataBuilder()
+					.setHubId(hd.getHubId())
+					.setHub(hd.getHub())
+					.setDate(hd.getDate())
+					.setRelativeToMaxCapacity(relativeMax)
+					.setTotalVolume(hd.getTotalVolume())
+					.setTotalWeight(hd.getTotalWeight())
+					.setQttShipments(hd.getQttShipments())
+					.setQttBoxesProcessed(hd.getQttBoxesProcessed())
+					.setQttPalletsBuilt(hd.getQttPalletsBuilt())
+					.setMaxShipments(hd.getMaxShipments())
+					.setMaxVolume(hd.getMaxVolume())
+					.setMaxWeight(hd.getMaxWeight())
+					.setMaxPallets(hd.getMaxPallets())
+					.setMaxBoxes(hd.getMaxBoxes())
+					.setShipmentsThroughputMeasurement(shipmentsThroughput)
+					.setWeightThroughputMeasurement(weightThroughput)
+					.setVolumeThroughputMeasurement(volumeThroughput)
+					.setPalletsThroughputMeasurement(palletsThroughput)
+					.setBoxesThroughputMeasurement(boxesThroughput)
+					.setHighCP(highCP)
+					.setCapacityPrediction(capacityPrediction)
+					.build();
+
+			fullHubDataList.add(fullHubData);
+
+
+		}
+
+
+		return fullHubDataList;
+
+	}
+
+	private static List<HubData> collectWaveData (String waves) {
 
 		//get data from waves
 		List<HubData> wavesHubDataList = new ArrayList<HubData>();
@@ -231,7 +358,7 @@ public class SimpleNeo4JGraphGenerator {
 
 	}
 
-	private static List<HubData> aggregateXDLUData (String xdlu) {
+	private static List<HubData> collectXDLUData (String xdlu) {
 
 		//get data from xdlu
 		List<HubData> xdluHubDataList = new ArrayList<HubData>();
@@ -290,7 +417,7 @@ public class SimpleNeo4JGraphGenerator {
 		return xdluHubDataList;
 	}
 
-	private static List<HubData> aggregateMaxData (String max) {
+	private static List<HubData> collectMaxData (String max) {
 
 		//get max data
 		List<HubData> maxList = new ArrayList<HubData>();
@@ -351,13 +478,11 @@ public class SimpleNeo4JGraphGenerator {
 
 	}
 
-	private static List<HubData> createCommonList (List<HubData> wavesHubDataList, List<HubData> xdluHubDataList, List<HubData> maxList) {
+	private static List<HubData> combineWaveXDLUMaxData (List<HubData> wavesHubDataList, List<HubData> xdluHubDataList, List<HubData> maxList) {
 
 		//iterate all three lists and create a common list
 		List<HubData> commonList = new ArrayList<HubData>();
 		HubData commonHubData = null;
-
-		//double relativeCapacity = 0;
 
 		for (HubData wavesData : wavesHubDataList) {
 			for (HubData xdluData : xdluHubDataList) {
@@ -388,106 +513,6 @@ public class SimpleNeo4JGraphGenerator {
 		}
 
 		return commonList;
-
-	}
-
-	private static List<HubData> computeRelativeToMaxCapacity (List<HubData> hubDataList, double CP_THRESHOLD) {
-
-		List<HubData> revisedHubDataList = new ArrayList<HubData>();
-
-		HubData revisedHubData = null;
-		double relativeMax = 0;
-		double relativeMaxShipment = 0;
-		double relativeMaxVolume = 0;
-		double relativeMaxWeight = 0;
-
-		String shipmentsThroughput = null;
-		String weightThroughput = null;
-		String volumeThroughput = null;
-		String palletsThroughput = null;
-		String boxesThroughput = null;
-		String capacityPrediction = null;
-
-		//attribute to hold whether the relativeToMaxCapacity is > 0.5
-		boolean highCP = false;
-
-		//relativeMaxCapacity is computed as the average of shipments, volume and weight
-		//TODO: implement these computations in separate method
-		for (HubData hd : hubDataList) {
-
-			//tweaking these since some discrepancy in modifiedOn (waves resp xdlu) results in daily max being larger than periodic max
-			if ((double)hd.getQttShipments() > (double)hd.getMaxShipments()) {
-				relativeMaxShipment = 1;
-			} else {
-				relativeMaxShipment = (double)hd.getQttShipments() / (double)hd.getMaxShipments();
-			}
-
-			if (hd.getTotalVolume() > hd.getMaxVolume()) {
-				relativeMaxVolume = 1;
-			} else {
-				relativeMaxVolume = hd.getTotalVolume() / hd.getMaxVolume();
-			}
-
-
-			if (hd.getTotalWeight() > hd.getMaxWeight()) {
-				relativeMaxWeight = 1;
-			} else {
-				relativeMaxWeight = hd.getTotalWeight() / hd.getMaxWeight();
-			}
-
-			relativeMax = (relativeMaxShipment + relativeMaxVolume + relativeMaxWeight) / 3;
-
-			//if the relativeToMaxCapacity is below the set threshold, then highCP is true
-			if (relativeMax < CP_THRESHOLD) {
-				highCP = true;
-			} else {
-				highCP = false;
-			}
-
-			shipmentsThroughput = computeShipmentsThroughputMeasurement(hd.getMaxShipments(), hd.getQttShipments(), CP_THRESHOLD);
-			weightThroughput = computeWeightThroughputMeasurement(hd.getMaxWeight(), hd.getTotalWeight(), CP_THRESHOLD);
-			volumeThroughput = computeVolumeThroughputMeasurement(hd.getMaxVolume(), hd.getTotalVolume(), CP_THRESHOLD);
-			palletsThroughput = computePalletsThroughputMeasurement(hd.getMaxPallets(), hd.getQttPalletsBuilt(), CP_THRESHOLD);
-			boxesThroughput = computeBoxesThroughputMeasurement(hd.getMaxBoxes(), hd.getQttBoxesProcessed(), CP_THRESHOLD);
-
-			if (highCP) {
-				capacityPrediction = "HighCapacityPrediction";
-			} else {
-				capacityPrediction = "LowCapacityPrediction";
-			}
-
-
-
-			revisedHubData = new HubData.HubDataBuilder()
-					.setHubId(hd.getHubId())
-					.setHub(hd.getHub())
-					.setDate(hd.getDate())
-					.setRelativeToMaxCapacity(relativeMax)
-					.setTotalVolume(hd.getTotalVolume())
-					.setTotalWeight(hd.getTotalWeight())
-					.setQttShipments(hd.getQttShipments())
-					.setQttBoxesProcessed(hd.getQttBoxesProcessed())
-					.setQttPalletsBuilt(hd.getQttPalletsBuilt())
-					.setMaxShipments(hd.getMaxShipments())
-					.setMaxVolume(hd.getMaxVolume())
-					.setMaxWeight(hd.getMaxWeight())
-					.setMaxPallets(hd.getMaxPallets())
-					.setMaxBoxes(hd.getMaxBoxes())
-					.setShipmentsThroughputMeasurement(shipmentsThroughput)
-					.setWeightThroughputMeasurement(weightThroughput)
-					.setVolumeThroughputMeasurement(volumeThroughput)
-					.setPalletsThroughputMeasurement(palletsThroughput)
-					.setBoxesThroughputMeasurement(boxesThroughput)
-					.setHighCP(highCP)
-					.setCapacityPrediction(capacityPrediction)
-					.build();
-
-			revisedHubDataList.add(revisedHubData);
-
-
-		}
-
-		return revisedHubDataList;
 
 	}
 

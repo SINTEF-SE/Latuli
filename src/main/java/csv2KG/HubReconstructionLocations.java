@@ -265,7 +265,7 @@ public class HubReconstructionLocations {
 				br = new BufferedReader(new FileReader(filesInDir[i]));
 				bw = new BufferedWriter(new FileWriter(tsvFile, true));
 
-				//System.out.println("Reading file: " + filesInDir[i].getName());
+				System.out.println("Reading file: " + filesInDir[i].getName());
 
 				try {
 					line = StringUtilities.oneByOne(br);

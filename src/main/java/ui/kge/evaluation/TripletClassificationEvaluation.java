@@ -9,19 +9,34 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import ui.kge.neo4j.simple.SimpleNeo4JGraphGenerator;
+import ui.kge.neo4j.simple.SimpleNeo4JGraphGenerator.HubData;
+
 public class TripletClassificationEvaluation {
 
 	public static void main(String[] args) throws IOException {
 
-		//Insert which KGE model to evaluate in the kgeModel variable
-		//Options are: RotatE, ComplEx, TransE, TucKER or ConvE
-		String kgeModel = "TucKER";
-		evaluate(kgeModel);
+		//Insert which KGE model to evaluate in the kgeModel variable, options:
+		//RotatE, ComplEx, TransE, TucKER or ConvE
+		String kgeModel = "RotatE";
+
+		//print evaluation data
+		String maxFile = "./files/DATASETS/HubCentric/max.csv";
+		String wavesFile = "./files/DATASETS/HubCentric/waves.csv";
+		String xdluFile = "./files/DATASETS/HubCentric/xdlu.csv";
+
+		List<HubData> aggregatedHubThroughputData = SimpleNeo4JGraphGenerator.aggregateHubThroughputData (maxFile, wavesFile, xdluFile, 0.75);
+
+		String correctCSV = "./files/EvaluationRotate/HubdataCorrectNew.csv";
+		String incorrectCSV = "./files/EvaluationRotate/HubdataIncorrectNew.csv";
+
+		evaluate(kgeModel, aggregatedHubThroughputData, correctCSV, incorrectCSV);
 
 	}
 
-	private static void evaluate(String kgeModel) throws IOException {
-				
+
+	private static void evaluate(String kgeModel, List<HubData> aggregatedHubThroughputData, String correctHubsOutput, String incorrectHubsOutput) throws IOException {
+
 		String neo4jDataFile = null;
 		String lowPredictionsFile = null;
 		String highPredictionsFile = null;
@@ -35,50 +50,42 @@ public class TripletClassificationEvaluation {
 			highPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Rotate/df_high.csv";
 			evaluationFile = "./files/DATASETS/HubCentric/Pykeen/Rotate/evaluationFile.csv";	
 			constructEvaluationHubs(neo4jDataFile, lowPredictionsFile, highPredictionsFile, evaluationFile);
-			//evaluate(evaluationFile);
 			break;
-		
+
 		case "ComplEx":
 			neo4jDataFile = "./files/DATASETS/HubCentric/Pykeen/Complex/neo4j_data.csv";
 			lowPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Complex/df_low.csv";
 			highPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Complex/df_high.csv";
 			evaluationFile = "./files/DATASETS/HubCentric/Pykeen/Complex/evaluationFile.csv";
 			constructEvaluationHubs(neo4jDataFile, lowPredictionsFile, highPredictionsFile, evaluationFile);
-			//evaluate(evaluationFile);
 			break;
-		
+
 		case "TransE":
 			neo4jDataFile = "./files/DATASETS/HubCentric/Pykeen/Transe/neo4j_data.csv";
 			lowPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Transe/df_low.csv";
 			highPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Transe/df_high.csv";
 			evaluationFile = "./files/DATASETS/HubCentric/Pykeen/Transe/evaluationFile.csv";
 			constructEvaluationHubs(neo4jDataFile, lowPredictionsFile, highPredictionsFile, evaluationFile);
-			//evaluate(evaluationFile);
 			break;
-		
+
 		case "TucKER":
 			neo4jDataFile = "./files/DATASETS/HubCentric/Pykeen/Tucker/neo4j_data.csv";
 			lowPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Tucker/df_low.csv";
 			highPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Tucker/df_high.csv";
 			evaluationFile = "./files/DATASETS/HubCentric/Pykeen/Tucker/evaluationFile.csv";
 			constructEvaluationHubs(neo4jDataFile, lowPredictionsFile, highPredictionsFile, evaluationFile);
-			//evaluate(evaluationFile);
 			break;
-		
+
 		case "ConvE":
 			neo4jDataFile = "./files/DATASETS/HubCentric/Pykeen/Conve/neo4j_data.csv";
 			lowPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Conve/df_low.csv";
 			highPredictionsFile = "./files/DATASETS/HubCentric/Pykeen/Conve/df_high.csv";
 			evaluationFile = "./files/DATASETS/HubCentric/Pykeen/Conve/evaluationFile.csv";
 			constructEvaluationHubs(neo4jDataFile, lowPredictionsFile, highPredictionsFile, evaluationFile);
-			//evaluate(evaluationFile);
 			break;
 		}
 		System.out.println("Knowledge Graph Embedding Model evaluated: " + kgeModel);
-		System.out.println("Evaluation File stored at: " + evaluationFile);
-		
-		//String inputEvaluationFile = evaluationFile;
-		
+		System.out.println("Evaluation File stored at: " + evaluationFile);		
 
 		BufferedReader evaluationFile_br = null;
 		String[] params = null;
@@ -98,6 +105,9 @@ public class TripletClassificationEvaluation {
 		List<EvaluatedHub> incorrectHubs = new ArrayList<EvaluatedHub>();
 		EvaluatedHub incorrectHub = null;
 
+		List<EvaluatedHub> correctHubs = new ArrayList<EvaluatedHub>();
+		EvaluatedHub correctHub = null;
+
 		try {
 			while ((line = evaluationFile_br.readLine()) != null) {
 				total++;
@@ -105,6 +115,19 @@ public class TripletClassificationEvaluation {
 
 				if (params[6].equals("Y")) {
 					numCorrect++;
+
+					correctHub = new EvaluatedHub.EvaluatedHubBuilder()
+							.setHubId(params[0])
+							.setPykeenId(params[1])
+							.setNeo4JId(params[2])
+							.setLowPredictionScore(Double.parseDouble(params[3]))
+							.setHighPredictionScore(Double.parseDouble(params[4]))
+							.setRelativeToMaxCapacity(Double.parseDouble(params[5]))
+							.setCorrectPrediction(params[6])
+							.setDistance(Double.parseDouble(params[7]))
+							.build();
+
+					correctHubs.add(correctHub);
 
 				} else {
 					numIncorrect++;
@@ -139,9 +162,86 @@ public class TripletClassificationEvaluation {
 		System.out.println("There are " + numCorrect + " correct predictions");
 		System.out.println("There are " + numIncorrect + " false predictions");
 		System.out.println("Prediction Correctness Ratio: " + correctRatio(numCorrect, total));
-		//System.out.println("Average vector distance for correct predictions: ");
-		//System.out.println("Average vector distance for incorrect predictions: ");
+		
+		//write all evaluation data to csv
+		BufferedWriter correct_bw = null;
+		BufferedWriter incorrect_bw = null;
+		
+		try {
+			correct_bw = new BufferedWriter(new FileWriter(correctHubsOutput));
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		
+		try {
+			incorrect_bw = new BufferedWriter(new FileWriter(incorrectHubsOutput));
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 
+		correct_bw.write("Hub, HubId, LowCapacityPrediction Score, HighCapacityPrediction Score, Vector Distance, RelativeToMaxCapacity Score, Capacity Prediction, "
+				+ "BoxesThroughput, PalletsThroughput, ShipmentsThroughput, VolumeThroughput, WeightThroughput");
+		correct_bw.newLine();
+
+		//combine with data used to create the knowledge graph
+		for (EvaluatedHub hub : correctHubs) {
+
+			for (HubData hd : aggregatedHubThroughputData) {
+
+				if (hub.hubId.equals(hd.getHubId())) {
+					
+					correct_bw.write(hub.hubId.substring(0, hub.hubId.indexOf("_")) + "," + hub.hubId + "," + hub.lowPredictionScore + "," + hub.highPredictionScore + "," + hub.distance
+							+ "," + hd.getRelativeToMaxCapacity() + "," + hd.getCapacityPrediction() + "," + convertThroughputMeasurements(hd.getBoxesThroughputMeasurement()) + "," + convertThroughputMeasurements(hd.getPalletsThroughputMeasurement()) + "," + convertThroughputMeasurements(hd.getShipmentsThroughputMeasurement())
+							+ "," + convertThroughputMeasurements(hd.getVolumeThroughputMeasurement()) + "," + convertThroughputMeasurements(hd.getWeightThroughputMeasurement()));	
+					correct_bw.newLine();
+				
+				}
+			}
+		}
+		
+		incorrect_bw.write("Hub, HubId, LowCapacityPrediction Score, HighCapacityPrediction Score, Vector Distance, RelativeToMaxCapacity Score, Capacity Prediction, "
+				+ "BoxesThroughput, PalletsThroughput, ShipmentsThroughput, VolumeThroughput, WeightThroughput");
+		incorrect_bw.newLine();
+		
+		for (EvaluatedHub hub : incorrectHubs) {
+
+			for (HubData hd : aggregatedHubThroughputData) {
+
+				if (hub.hubId.equals(hd.getHubId())) {
+					
+					incorrect_bw.write(hub.hubId.substring(0, hub.hubId.indexOf("_")) + "," + hub.hubId + "," + hub.lowPredictionScore + "," + hub.highPredictionScore + "," + hub.distance
+							+ "," + hd.getRelativeToMaxCapacity() + "," + hd.getCapacityPrediction() + "," + convertThroughputMeasurements(hd.getBoxesThroughputMeasurement()) + "," + convertThroughputMeasurements(hd.getPalletsThroughputMeasurement()) + "," + convertThroughputMeasurements(hd.getShipmentsThroughputMeasurement())
+							+ "," + convertThroughputMeasurements(hd.getVolumeThroughputMeasurement()) + "," + convertThroughputMeasurements(hd.getWeightThroughputMeasurement()));	
+					incorrect_bw.newLine();
+				
+				}
+			}
+		}
+
+		try {
+			correct_bw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			incorrect_bw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private static String convertThroughputMeasurements (String input) {
+		
+		String conversion = null; 
+		
+		if (input.startsWith("Low")) {
+			conversion = "0";
+		} else {
+			conversion = "1";
+		}
+		
+		return conversion;
 	}
 
 	private static double correctRatio (double correct, double total) {
@@ -381,6 +481,8 @@ public class TripletClassificationEvaluation {
 		}
 
 	}
+
+
 
 
 	public static class CapacityPrediction {
