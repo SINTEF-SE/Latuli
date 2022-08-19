@@ -3,12 +3,15 @@ package csvfiltering;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -69,7 +72,12 @@ public class CSVProcessor {
         CSVWriter writer = new CSVWriter(outputfile);
 
 		try {
-			br = new BufferedReader(new FileReader(csvFileIn));
+			try {
+				br = new BufferedReader(new InputStreamReader(new FileInputStream(csvFileIn), "UTF-8"));
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		}
@@ -293,7 +301,12 @@ public class CSVProcessor {
 
 
 		try {
-			br = new BufferedReader(new FileReader(csvFileIn));
+			try {
+				br = new BufferedReader(new InputStreamReader(new FileInputStream(csvFileIn), "UTF-8"));
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		}
@@ -533,7 +546,12 @@ public class CSVProcessor {
 		//read transport ids from file
 		Set<String> transportIds = new HashSet<String>();
 		try {
-			br = new BufferedReader(new FileReader(relevantIds));
+			try {
+				br = new BufferedReader(new InputStreamReader(new FileInputStream(relevantIds), "UTF-8"));
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -560,7 +578,12 @@ public class CSVProcessor {
 			String line;		
 
 			try {
-				br = new BufferedReader(new FileReader(filesInDir[i]));
+				try {
+					br = new BufferedReader(new InputStreamReader(new FileInputStream(filesInDir[i]), "UTF-8"));
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -607,7 +630,12 @@ public class CSVProcessor {
 		//read shipment item ids from file
 		Set<String> shipmentItemIds = new HashSet<String>();
 		try {
-			br = new BufferedReader(new FileReader(relevantIds));
+			try {
+				br = new BufferedReader(new InputStreamReader(new FileInputStream(relevantIds), "UTF-8"));
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -636,7 +664,12 @@ public class CSVProcessor {
 			String line;		
 
 			try {
-				br = new BufferedReader(new FileReader(filesInDir[i]));
+				try {
+					br = new BufferedReader(new InputStreamReader(new FileInputStream(filesInDir[i]), "UTF-8"));
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -682,7 +715,12 @@ public class CSVProcessor {
 		//read shipment item ids from file
 		Set<String> shipmentItemIds = new HashSet<String>();
 		try {
-			br = new BufferedReader(new FileReader(relevantIds));
+			try {
+				br = new BufferedReader(new InputStreamReader(new FileInputStream(relevantIds), "UTF-8"));
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -710,7 +748,12 @@ public class CSVProcessor {
 			String line;		
 
 			try {
-				br = new BufferedReader(new FileReader(filesInDir[i]));
+				try {
+					br = new BufferedReader(new InputStreamReader(new FileInputStream(filesInDir[i]), "UTF-8"));
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -757,7 +800,12 @@ public class CSVProcessor {
 		//read loading unit ids from file
 		Set<String> loadingUnitIds = new HashSet<String>();
 		try {
-			br = new BufferedReader(new FileReader(relevantIds));
+			try {
+				br = new BufferedReader(new InputStreamReader(new FileInputStream(relevantIds), "UTF-8"));
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -785,7 +833,12 @@ public class CSVProcessor {
 			String line;		
 
 			try {
-				br = new BufferedReader(new FileReader(filesInDir[i]));
+				try {
+					br = new BufferedReader(new InputStreamReader(new FileInputStream(filesInDir[i]), "UTF-8"));
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -832,7 +885,12 @@ public class CSVProcessor {
 		//read loading unit ids from file
 		Set<String> loadingUnitIds = new HashSet<String>();
 		try {
-			br = new BufferedReader(new FileReader(relevantIds));
+			try {
+				br = new BufferedReader(new InputStreamReader(new FileInputStream(relevantIds), "UTF-8"));
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -860,7 +918,12 @@ public class CSVProcessor {
 			String line;		
 
 			try {
-				br = new BufferedReader(new FileReader(filesInDir[i]));
+				try {
+					br = new BufferedReader(new InputStreamReader(new FileInputStream(filesInDir[i]), "UTF-8"));
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -909,7 +972,12 @@ public class CSVProcessor {
 		//read loading unit ids from file
 		Set<String> loadingUnitIds = new HashSet<String>();
 		try {
-			br = new BufferedReader(new FileReader(relevantIds));
+			try {
+				br = new BufferedReader(new InputStreamReader(new FileInputStream(relevantIds), "UTF-8"));
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -937,7 +1005,12 @@ public class CSVProcessor {
 			String line;		
 
 			try {
-				br = new BufferedReader(new FileReader(filesInDir[i]));
+				try {
+					br = new BufferedReader(new InputStreamReader(new FileInputStream(filesInDir[i]), "UTF-8"));
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -984,7 +1057,12 @@ public class CSVProcessor {
 		//read wave ids from file
 		Set<String> waveIds = new HashSet<String>();
 		try {
-			br = new BufferedReader(new FileReader(relevantIds));
+			try {
+				br = new BufferedReader(new InputStreamReader(new FileInputStream(relevantIds), "UTF-8"));
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -1012,7 +1090,12 @@ public class CSVProcessor {
 			String line;		
 
 			try {
-				br = new BufferedReader(new FileReader(filesInDir[i]));
+				try {
+					br = new BufferedReader(new InputStreamReader(new FileInputStream(filesInDir[i]), "UTF-8"));
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -1070,7 +1153,12 @@ public class CSVProcessor {
 			String line;		
 
 			try {
-				br = new BufferedReader(new FileReader(filesInDir[i]));
+				try {
+					br = new BufferedReader(new InputStreamReader(new FileInputStream(filesInDir[i]), "UTF-8"));
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -1115,7 +1203,12 @@ public class CSVProcessor {
 		//read consignment ids from file
 		Set<String> consignmentIds = new HashSet<String>();
 		try {
-			br = new BufferedReader(new FileReader(relevantIds));
+			try {
+				br = new BufferedReader(new InputStreamReader(new FileInputStream(relevantIds), "UTF-8"));
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -1143,7 +1236,12 @@ public class CSVProcessor {
 			String line;		
 
 			try {
-				br = new BufferedReader(new FileReader(filesInDir[i]));
+				try {
+					br = new BufferedReader(new InputStreamReader(new FileInputStream(filesInDir[i]), "UTF-8"));
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -1198,7 +1296,12 @@ public class CSVProcessor {
 			String line;		
 
 			try {
-				br = new BufferedReader(new FileReader(filesInDir[i]));
+				try {
+					br = new BufferedReader(new InputStreamReader(new FileInputStream(filesInDir[i]), "UTF-8"));
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -1263,7 +1366,12 @@ public class CSVProcessor {
 			String line;		
 
 			try {
-				br = new BufferedReader(new FileReader(filesInDir[i]));
+				try {
+					br = new BufferedReader(new InputStreamReader(new FileInputStream(filesInDir[i]), "UTF-8"));
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -1323,7 +1431,12 @@ public class CSVProcessor {
 		//read loading unit ids from file
 		Set<String> loadingUnitIds = new HashSet<String>();
 		try {
-			br = new BufferedReader(new FileReader(filterPath));
+			try {
+				br = new BufferedReader(new InputStreamReader(new FileInputStream(filterPath), "UTF-8"));
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -1344,7 +1457,12 @@ public class CSVProcessor {
 		for (int i = 0; i < filesInDir.length; i++) {
 
 			try {
-				br = new BufferedReader(new FileReader(filesInDir[i]));
+				try {
+					br = new BufferedReader(new InputStreamReader(new FileInputStream(filesInDir[i]), "UTF-8"));
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -1416,7 +1534,12 @@ public class CSVProcessor {
 		//read consignment ids from file
 		Set<String> consignmentIds = new HashSet<String>();
 		try {
-			br = new BufferedReader(new FileReader(filterPath));
+			try {
+				br = new BufferedReader(new InputStreamReader(new FileInputStream(filterPath), "UTF-8"));
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -1437,7 +1560,12 @@ public class CSVProcessor {
 		for (int i = 0; i < filesInDir.length; i++) {
 
 			try {
-				br = new BufferedReader(new FileReader(filesInDir[i]));
+				try {
+					br = new BufferedReader(new InputStreamReader(new FileInputStream(filesInDir[i]), "UTF-8"));
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -1494,7 +1622,7 @@ public class CSVProcessor {
 	}
 
 	private static void printRelevantConLoadWave (String inputFolder, String loadingUnitIdFile, String consignmentIdFile, String waveIdFile) throws ParseException {
-
+		
 		Set<String> consignmentIds = new HashSet<String>();
 		Set<String> waveIds = new HashSet<String>();
 		Set<String> loadingUnitIds = new HashSet<String>();
@@ -1513,7 +1641,7 @@ public class CSVProcessor {
 
 				String line;		
 
-				br = new BufferedReader(new FileReader(filesInDir[i]));
+				br = new BufferedReader(new InputStreamReader(new FileInputStream(filesInDir[i]), "UTF-8"));
 
 				while ((line = br.readLine()) != null) {
 
@@ -1543,7 +1671,6 @@ public class CSVProcessor {
 			}
 
 		}
-
 
 		//print relevant loading unit ids to file
 		try {

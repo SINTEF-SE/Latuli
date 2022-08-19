@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
@@ -52,7 +55,7 @@ public class TradeItems {
 
 			try {
 
-				br = new BufferedReader(new FileReader(filesInDir[i]));
+				br = new BufferedReader(new InputStreamReader(new FileInputStream(filesInDir[i]), "UTF-8"));
 				bw = new BufferedWriter(new FileWriter(ntFile, true));
 
 
@@ -151,7 +154,7 @@ public class TradeItems {
 
 			try {
 
-				br = new BufferedReader(new FileReader(filesInDir[i]));
+				br = new BufferedReader(new InputStreamReader(new FileInputStream(filesInDir[i]), "UTF-8"));
 				bw = new BufferedWriter(new FileWriter(tsvFile, true));
 
 
@@ -262,7 +265,7 @@ public class TradeItems {
 
 				try {
 
-					br = new BufferedReader(new FileReader(filesInDir[i]));
+					br = new BufferedReader(new InputStreamReader(new FileInputStream(filesInDir[i]), "UTF-8"));
 
 					//System.out.println("Reading file: " + filesInDir[i].getName());
 
@@ -373,7 +376,7 @@ public class TradeItems {
 
 				try {
 
-					br = new BufferedReader(new FileReader(filesInDir[i]));
+					br = new BufferedReader(new InputStreamReader(new FileInputStream(filesInDir[i]), "UTF-8"));
 
 					//System.out.println("Reading file: " + filesInDir[i].getName());
 

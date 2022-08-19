@@ -3,9 +3,12 @@ package csv2KG;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +57,7 @@ public static void processSimpleXDocLoadingUnitsToNTriple (File xdluFolder, Stri
 			try {
 
 
-				br = new BufferedReader(new FileReader(filesInDir[i]));
+				br = new BufferedReader(new InputStreamReader(new FileInputStream(filesInDir[i]), "UTF-8"));
 				bw = new BufferedWriter(new FileWriter(ntFile, true));
 				
 				try {
@@ -155,7 +158,7 @@ public static void processSimpleXDocLoadingUnitsToNTriple (File xdluFolder, Stri
 			try {
 
 
-				br = new BufferedReader(new FileReader(filesInDir[i]));
+				br = new BufferedReader(new InputStreamReader(new FileInputStream(filesInDir[i]), "UTF-8"));
 				bw = new BufferedWriter(new FileWriter(tsvFile, true));
 
 				
@@ -166,7 +169,6 @@ public static void processSimpleXDocLoadingUnitsToNTriple (File xdluFolder, Stri
 				}
 
 				for (String[] params : line) {
-
 
 					//isType				
 					xDocLoadingUnitEntity = params[0] + "_xDocLoadingUnit";
@@ -254,7 +256,7 @@ public static void processSimpleXDocLoadingUnitsToNTriple (File xdluFolder, Stri
 			try {
 
 
-				br = new BufferedReader(new FileReader(filesInDir[i]));
+				br = new BufferedReader(new InputStreamReader(new FileInputStream(filesInDir[i]), "UTF-8"));
 				bw = new BufferedWriter(new FileWriter(ntFile, true));
 
 				//System.out.println("Reading file: " + filesInDir[i].getName());
@@ -413,7 +415,7 @@ public static void processSimpleXDocLoadingUnitsToNTriple (File xdluFolder, Stri
 			try {
 
 
-				br = new BufferedReader(new FileReader(filesInDir[i]));
+				br = new BufferedReader(new InputStreamReader(new FileInputStream(filesInDir[i]), "UTF-8"));
 				bw = new BufferedWriter(new FileWriter(tsvFile, true));
 
 
@@ -589,7 +591,7 @@ public static void processSimpleXDocLoadingUnitsToNTriple (File xdluFolder, Stri
 
 					String line;		
 
-					br = new BufferedReader(new FileReader(filesInDir[i]));
+					br = new BufferedReader(new InputStreamReader(new FileInputStream(filesInDir[i]), "UTF-8"));
 
 					//System.out.println("Reading file: " + filesInDir[i].getName());
 
@@ -768,7 +770,7 @@ public static void processSimpleXDocLoadingUnitsToNTriple (File xdluFolder, Stri
 
 					String line;		
 
-					br = new BufferedReader(new FileReader(filesInDir[i]));
+					br = new BufferedReader(new InputStreamReader(new FileInputStream(filesInDir[i]), "UTF-8"));
 
 					//System.out.println("Reading file: " + filesInDir[i].getName());
 

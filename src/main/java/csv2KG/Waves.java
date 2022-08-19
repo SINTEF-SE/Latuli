@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
@@ -55,7 +58,7 @@ public class Waves {
 			try {
 
 
-				br = new BufferedReader(new FileReader(filesInDir[i]));
+				br = new BufferedReader(new InputStreamReader(new FileInputStream(filesInDir[i]), "UTF-8"));
 				bw = new BufferedWriter(new FileWriter(ntFile, true));
 
 				try {
@@ -143,7 +146,7 @@ public class Waves {
 			try {
 
 
-				br = new BufferedReader(new FileReader(filesInDir[i]));
+				br = new BufferedReader(new InputStreamReader(new FileInputStream(filesInDir[i]), "UTF-8"));
 				bw = new BufferedWriter(new FileWriter(tsvFile, true));
 
 				try {
@@ -153,8 +156,7 @@ public class Waves {
 				}
 
 				for (String[] params : line) {
-
-
+					
 					//isType					
 					waveEntity = params[0] + "_wave";
 					bw.write(waveEntity + "\t" + "isType" + "\t" + "Wave" + "\n");
@@ -229,7 +231,7 @@ public class Waves {
 			try {
 
 
-				br = new BufferedReader(new FileReader(filesInDir[i]));
+				br = new BufferedReader(new InputStreamReader(new FileInputStream(filesInDir[i]), "UTF-8"));
 				bw = new BufferedWriter(new FileWriter(ntFile, true));
 
 				try {
@@ -375,7 +377,7 @@ public class Waves {
 			try {
 
 
-				br = new BufferedReader(new FileReader(filesInDir[i]));
+				br = new BufferedReader(new InputStreamReader(new FileInputStream(filesInDir[i]), "UTF-8"));
 				bw = new BufferedWriter(new FileWriter(tsvFile, true));
 
 				try {
@@ -524,7 +526,7 @@ public class Waves {
 
 					String line;		
 
-					br = new BufferedReader(new FileReader(filesInDir[i]));
+					br = new BufferedReader(new InputStreamReader(new FileInputStream(filesInDir[i]), "UTF-8"));
 
 					while ((line = br.readLine()) != null) {
 
@@ -647,7 +649,7 @@ public class Waves {
 
 					String line;		
 
-					br = new BufferedReader(new FileReader(filesInDir[i]));
+					br = new BufferedReader(new InputStreamReader(new FileInputStream(filesInDir[i]), "UTF-8"));
 
 					while ((line = br.readLine()) != null) {
 
