@@ -1,1 +1,0 @@
-ShipmentItemId:ID,ShipmentId,LoadingUnit,ModifiedOn:datetime,Quantity:int,:LABEL

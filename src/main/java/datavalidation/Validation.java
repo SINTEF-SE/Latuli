@@ -9,36 +9,22 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Validation {
 
+	//test method
 	public static void main(String[] args) {
-		
-//		String testDate = "\"2019-08-12T10:49\"";
-//		System.out.println("Is " + testDate + " a valid date?: " + isValidDate(testDate));
-		
-//		String testInt = "NULL";
-//
-//		System.out.println("Is " + testInt + " a valid int?: " + isValidInt(testInt));
-//
-//		String testDouble = "\"0.600000\"";
-//		System.out.println("Is " + testDouble + " a valid double?: " + isValidDouble(testDouble));
-//		
-//		String line = "\"56000736710509844\",\"54670\",\"2022-03-30T05:17\",\"0\",\"50\",\"0\",\"0\",\"0\",\"0.600000\",\"165.000000\",\"Consignment\"";
-//		
-//		String[] params = line.split(",");
-//		
-//		for (String s : params) {
-//			System.out.println(s);
-//		}
-		
+
+
 		String inputConsignmentCSV = "./files/DATASETS/FilteredByColumns/consignments.csv";
 		String inputShipmentsCSV = "./files/DATASETS/FilteredByColumns/shipments.csv";
 		String inputShipmentItemsCSV = "./files/DATASETS/FilteredByColumns/shipmentitems.csv";
 		String inputLoadingUnitsCSV = "./files/DATASETS/FilteredByColumns/loadingunits.csv";
 		String inputXDocLoadingUnitsCSV = "./files/DATASETS/FilteredByColumns/xdlu.csv";
 		String inputWavesCSV = "./files/DATASETS/FilteredByColumns/waves.csv";
-		
+
 		String outputConsignmentCSV = "./files/DATASETS/FilteredByColumns/consignments_validated.csv";
 		String outputShipmentsCSV = "./files/DATASETS/FilteredByColumns/shipments_validated.csv";
 		String outputShipmentItemsCSV = "./files/DATASETS/FilteredByColumns/shipmentitems_validated.csv";
@@ -46,23 +32,81 @@ public class Validation {
 		String outputXDocLoadingUnitsCSV = "./files/DATASETS/FilteredByColumns/xdlu_validated.csv";
 		String outputWavesCSV = "./files/DATASETS/FilteredByColumns/waves_validated.csv";
 
-		
+
 		validateConsignments(inputConsignmentCSV, outputConsignmentCSV);
 
 		validateShipments(inputShipmentsCSV, outputShipmentsCSV);
-		
+
 		validateShipmentItems(inputShipmentItemsCSV, outputShipmentItemsCSV);
-		
+
 		validateLoadingUnits(inputLoadingUnitsCSV, outputLoadingUnitsCSV);
-		
+
 		validateXDocLoadingUnits(inputXDocLoadingUnitsCSV, outputXDocLoadingUnitsCSV);
-		
+
 		validateWaves(inputWavesCSV, outputWavesCSV);
 
 	}
 
+	public static void validateHubs(String inputCSV, String outputCSV) {
+
+		System.out.println("Validating hubreconstructionlocations...");
+
+		BufferedReader br = null;
+		BufferedWriter bw = null;
+		String[] params = null;
+		String line;		
+		Set<String> uniqueHubs = new HashSet<String>();
+
+		try {
+			br = new BufferedReader(new FileReader(inputCSV));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		try {
+			bw = new BufferedWriter(new FileWriter(outputCSV));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		try {
+			while ((line = br.readLine()) != null) {
+
+				params = line.split(",");
+
+				//if (isValidId(params[0])) {
+					uniqueHubs.add(line);
+				//}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
+		try {
+			br.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		try {
+			for (String hub : uniqueHubs) {
+				bw.write(hub + ",Hub");
+				bw.newLine();
+			} 	
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+
+
+		try {
+			bw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
 	public static void validateConsignments(String inputCSV, String outputCSV) {
-		
+
 		System.out.println("Validating consignments...");
 
 		BufferedReader br = null;
@@ -114,7 +158,7 @@ public class Validation {
 	public static void validateShipments(String inputCSV, String outputCSV) {
 
 		System.out.println("Validating shipments...");
-		
+
 		BufferedReader br = null;
 		BufferedWriter bw = null;
 		String[] params = null;
@@ -157,9 +201,9 @@ public class Validation {
 		}
 
 	}
-	
+
 	public static void validateShipmentItems(String inputCSV, String outputCSV) {
-		
+
 		System.out.println("Validating shipmentitems...");
 
 		BufferedReader br = null;
@@ -205,7 +249,7 @@ public class Validation {
 	}
 
 	public static void validateLoadingUnits(String inputCSV, String outputCSV) {
-		
+
 		System.out.println("Validating loadingunits...");
 
 		BufferedReader br = null;
@@ -252,7 +296,7 @@ public class Validation {
 	}
 
 	public static void validateXDocLoadingUnits(String inputCSV, String outputCSV) {
-		
+
 		System.out.println("Validating xdlu...");
 
 		BufferedReader br = null;
@@ -301,7 +345,7 @@ public class Validation {
 	}
 
 	public static void validateWaves(String inputCSV, String outputCSV) {
-		
+
 		System.out.println("Validating waves...");
 
 		BufferedReader br = null;
@@ -348,25 +392,25 @@ public class Validation {
 		}
 
 	}
-	
+
 	public static boolean isValidDate(String date) 
 	{
-		
+
 		String DATE_FORMAT = "\"yyyy-MM-dd'T'HH:mm\"";
-		
-	        try {
-	            DateFormat df = new SimpleDateFormat(DATE_FORMAT);
-	            df.setLenient(false);
-	            df.parse(date);
-	            return true;
-	        } catch (ParseException e) {
-	            return false;
-	        }
+
+		try {
+			DateFormat df = new SimpleDateFormat(DATE_FORMAT);
+			df.setLenient(false);
+			df.parse(date);
+			return true;
+		} catch (ParseException e) {
+			return false;
+		}
 	}
 
 
 	public static boolean isValidId (String idValue) {
-		
+
 		if (idValue.equals("NULL") || idValue.equals("\"NULL\"")) {
 			return false;
 		} else {

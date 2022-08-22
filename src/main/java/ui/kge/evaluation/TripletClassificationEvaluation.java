@@ -9,8 +9,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import ui.kge.neo4j.simple.SimpleNeo4JGraphGenerator;
-import ui.kge.neo4j.simple.SimpleNeo4JGraphGenerator.HubData;
+import ui.kge.neo4j.simplegraph.SimpleNeo4JGraphGenerator;
+import ui.kge.neo4j.simplegraph.SimpleNeo4JGraphGenerator.HubData;
 
 public class TripletClassificationEvaluation {
 

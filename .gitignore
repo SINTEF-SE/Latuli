@@ -1,4 +1,5 @@
 files/
+TESTNEO4J/
 target/
 .DS_Store
 .classpath

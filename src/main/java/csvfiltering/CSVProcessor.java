@@ -16,6 +16,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,6 +39,14 @@ import com.opencsv.CSVWriter;
 import utilities.StringUtilities;
 
 public class CSVProcessor {
+	
+	public static void main(String[] args) throws IOException {
+		
+		//private static void reformatShipmentItems (String inputFile, String outputFile) {
+		String inputFile = "./files/DATASETS/Sample_3M/shipmentitems2.csv";
+		reformatShipmentItems (inputFile);
+		
+	}
 	
 	private static boolean isDate (String input) {
 		
@@ -131,6 +140,7 @@ public class CSVProcessor {
 		String waves_folder_in = inputFolder + "waves_split_filtered";
 		String shipmentItems_folder_in = inputFolder + "shipmentitems_split_filtered";
 		String shipments_folder_in = inputFolder + "shipments_split_filtered";
+		String hub_folder_in = inputFolder + "hubreconstructionlocations_split_filtered";
 
 		String xdlu_folder_out = outputFolder + "xdlu_split_filtered";
 		String consignments_folder_filtered = outputFolder + "consignments_split_filtered";
@@ -138,14 +148,26 @@ public class CSVProcessor {
 		String waves_folder_filtered = outputFolder + "waves_split_filtered";
 		String shipmentItems_folder_filtered = outputFolder + "shipmentitems_split_filtered";
 		String shipments_folder_filtered = outputFolder + "shipments_split_filtered";
+		String hub_folder_filtered = outputFolder + "hubreconstructionlocations_split_filtered";
 		
 		formatDatesInXDocLoadingUnits (xdlu_folder_in, xdlu_folder_out);		
 		formatDatesInConsignments(consignments_folder_in, consignments_folder_filtered);		
 		formatDatesInLoadingUnits(loadingUnits_folder_in, loadingUnits_folder_filtered);		
 		formatDatesInWaves(waves_folder_in, waves_folder_filtered);			
 		formatDatesInShipmentItems(shipmentItems_folder_in, shipmentItems_folder_filtered);			
-		formatDatesInShipments(shipments_folder_in, shipments_folder_filtered);		
+		formatDatesInShipments(shipments_folder_in, shipments_folder_filtered);
+		formatDatesInHubs(hub_folder_in, hub_folder_filtered);	
 			
+	}
+	
+	private static void formatDatesInHubs(String inputFolder, String filteredFolder) {
+		File folder = new File (inputFolder);
+		File[] files = folder.listFiles();
+		
+		for (File f : files) {
+			
+			correctDateTime(f.getPath(), f.getPath().replace(inputFolder, filteredFolder));
+		}
 	}
 	
 	private static void formatDatesInXDocLoadingUnits(String inputFolder, String filteredFolder) {
@@ -200,7 +222,7 @@ public class CSVProcessor {
 	}
 	
 	public static void filterOnColumns(String inputFolder, String outputFolder, List<Integer> xdlu_columns, List<Integer> consignment_columns, List<Integer> shipment_columns,
-			List<Integer> shipmentItems_columns, List<Integer> loadingUnit_columns, List<Integer> wave_columns) throws ParseException, IOException {
+			List<Integer> shipmentItems_columns, List<Integer> loadingUnit_columns, List<Integer> wave_columns, List<Integer> hub_columns) throws ParseException, IOException {
 
 		createFolders(outputFolder);
 
@@ -210,6 +232,7 @@ public class CSVProcessor {
 		String waves_folder_in = inputFolder + "waves_split_filtered";
 		String shipmentItems_folder_in = inputFolder + "shipmentitems_split_filtered";
 		String shipments_folder_in = inputFolder + "shipments_split_filtered";
+		String hub_folder_in = inputFolder + "hubreconstructionlocations_split_filtered";
 
 		String xdlu_folder_out = outputFolder + "xdlu_split_filtered";
 		String consignments_folder_filtered = outputFolder + "consignments_split_filtered";
@@ -217,16 +240,28 @@ public class CSVProcessor {
 		String waves_folder_filtered = outputFolder + "waves_split_filtered";
 		String shipmentItems_folder_filtered = outputFolder + "shipmentitems_split_filtered";
 		String shipments_folder_filtered = outputFolder + "shipments_split_filtered";
+		String hub_folder_filtered = outputFolder + "hubreconstructionlocations_split_filtered";
 
 		filterXDocLoadingUnitsByColumns (xdlu_folder_in, xdlu_folder_out, xdlu_columns);		
 		filterConsignmentsByColumns(consignments_folder_in, consignments_folder_filtered, consignment_columns);		
 		filterLoadingUnitsByColumns(loadingUnits_folder_in, loadingUnits_folder_filtered, loadingUnit_columns);		
 		filterWavesByColumns(waves_folder_in, waves_folder_filtered, wave_columns);			
 		filterShipmentItemsByColumns(shipmentItems_folder_in, shipmentItems_folder_filtered, shipmentItems_columns);			
-		filterShipmentsByColumns(shipments_folder_in, shipments_folder_filtered, shipment_columns);			
+		filterShipmentsByColumns(shipments_folder_in, shipments_folder_filtered, shipment_columns);	
+		filterHubReconstructionLocationsByColumns(hub_folder_in, hub_folder_filtered, hub_columns);
 
 	}
 	
+	private static void filterHubReconstructionLocationsByColumns(String inputFolder, String filteredFolder, List<Integer> columns) {
+		File folder = new File (inputFolder);
+		File[] files = folder.listFiles();
+		
+		for (File f : files) {
+			filterCSVByColumns(f.getPath(), f.getPath().replace(inputFolder, filteredFolder), columns);
+		}
+		
+
+	}
 
 	private static void filterXDocLoadingUnitsByColumns(String inputFolder, String filteredFolder, List<Integer> columns) {
 		File folder = new File (inputFolder);
@@ -366,6 +401,67 @@ public class CSVProcessor {
 			e.printStackTrace();
 		}
 
+
+	}
+	
+	private static void reformatShipmentItems (String inputFile) throws IOException {
+		
+		BufferedReader br = null;
+		BufferedWriter bw = null;
+		
+		File input = new File (inputFile);
+		File output = new File ("tmp");
+		
+		//create a tmp file to hold the content
+		FileWriter fw = null;		
+		
+		try {
+			fw = new FileWriter(output);
+		} catch (IOException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+
+		List<String[]> line = new ArrayList<String[]>();
+		
+//		try {
+//			try {
+//				br = new BufferedReader(new FileReader(input));
+//			} catch (UnsupportedEncodingException e) {
+//				e.printStackTrace();
+//			}
+//		} catch (FileNotFoundException e1) {
+//			e1.printStackTrace();
+//		}
+		
+		
+		br = new BufferedReader(new FileReader(input));
+		
+		bw = new BufferedWriter(fw);
+		
+		try {
+			line = StringUtilities.oneByOne(br);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		String shipmentId = null;
+		String loadingUnitId = null;
+		
+		for (String[] params : line) {
+
+			shipmentId = params[0];
+			loadingUnitId = params[1];
+			try {
+				bw.write(shipmentId + "_" + loadingUnitId + "," + params[0] + "," + params[1] + "," + params[2] + "," + params[3] + "," + params[4]);
+				bw.newLine();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+		}//end for
+		
+		output.renameTo(input);
 
 	}
 
@@ -1292,7 +1388,7 @@ public class CSVProcessor {
 		BufferedWriter bw = null;
 
 		for (int i = 0; i < filesInDir.length; i++) {
-
+			
 			String line;		
 
 			try {
@@ -1315,7 +1411,7 @@ public class CSVProcessor {
 				while ((line = br.readLine()) != null) {
 
 					params = line.split(",");
-
+					
 
 					if (!params[8].equals("NULL") && withinPeriod(params[8], startDateTime, endDateTime)) {
 

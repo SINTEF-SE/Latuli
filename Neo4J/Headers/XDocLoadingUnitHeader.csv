@@ -1,1 +1,0 @@
-InternalId:ID,PreSortScanOn:datetime,ReconstructedScanOn:datetime,FinishedScanOn:datetime,Volume:double,Weight:double,LoadingUnitId,InboundConsignmentId,OutboundConsignmentId,HubReconstructionAdditionalPartyIdentification,WaveId,ReconstructionTypeId,SplitShipment,InboundParentLoadingUnitId,OutboundParentLoadingUnitId,:LABEL

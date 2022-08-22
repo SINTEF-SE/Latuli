@@ -1,1 +1,0 @@
-ConsignmentId:ID,WaveId,TaskClosedOn:datetime,FullPalletConsignment,QttBoxes:int,QttPallets:int,QttReconstructedPallets:int,QttReconstructedParcels:int,TotalConsignmentVolume:double,TotalConsignmentWeight:double,:LABEL
