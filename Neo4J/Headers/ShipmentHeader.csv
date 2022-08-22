@@ -1,0 +1,1 @@
+ShipmentId:ID,ShippedOn:datetime,QttBoxes:int,QttPallets:int,:LABEL

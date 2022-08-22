@@ -1,0 +1,1 @@
+WaveId:ID,PlannedOn:datetime,ReleasedOn:datetime,HubAdditionalPartyIdentification,ClosedOn:datetime,WaveName,CreatedOn:datetime,Status,WaveStartProcessingOn:datetime,WaveEndProcessingOn:datetime,QttTrailers:int,QttBoxes:int,QttPallets:int,QttBoxesProcessed:int,QttPalletsBuilt:int,QttTasks:int,QttShipments:int,:LABEL
