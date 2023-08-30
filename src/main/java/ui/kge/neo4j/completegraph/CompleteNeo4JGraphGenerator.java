@@ -72,6 +72,7 @@ public class CompleteNeo4JGraphGenerator {
 		//		String parentFolder = "Neo4J";
 		//
 		
+		//creates the necessary folder structure for storing the generated output files
 		createFolders(parentFolder + "/");
 		
 		String nodeOutput = parentFolder + "/Nodes";
@@ -112,6 +113,7 @@ public class CompleteNeo4JGraphGenerator {
 
 		System.out.println("\nThis process may take several minutes to complete...");	  
 
+		//temporary folders that will be deleted after the transformation is complete
 		String tmpSplitFiles = "tmpSplitFiles/";
 		String tmpSplitFilesFiltered = "tmpSplitFilesFiltered/";
 		String tmpSplitFilesByColumn = "tmpSplitFilesByColumn/";
@@ -163,6 +165,7 @@ public class CompleteNeo4JGraphGenerator {
 				}
 			}
 
+			//split the input CSV files into manageable files
 			System.out.println("Splitting file " + file.getName() + " (" + file.length() / (1024 * 1024) + " MB) into chunks of max size " + chunkSize + " MB...");
 			try {
 				CSVProcessor.splitCSV(file.getPath(), tmpSplitFiles, chunkSize);
@@ -171,6 +174,7 @@ public class CompleteNeo4JGraphGenerator {
 			}
 		}
 
+		//first limit the CSV files based on desired period
 		try {
 			System.out.println("Filtering the dataset according to desired period...");
 			CSVProcessor.filterOnPeriod(startDateTime, endDateTime, tmpSplitFiles, tmpSplitFilesFiltered);
@@ -180,7 +184,7 @@ public class CompleteNeo4JGraphGenerator {
 			e.printStackTrace();
 		}
 
-		//filter on columns
+		//...then filter on relevant columns
 		try {
 			CSVProcessor.filterOnColumns(tmpSplitFilesFiltered, tmpSplitFilesByColumn, xDocLoadingUnitColumns, consignmentColumns, 
 					shipmentColumns, shipmentItemsColumns, loadingUnitColumns, waveColumns, hubColumns);
@@ -261,6 +265,11 @@ public class CompleteNeo4JGraphGenerator {
 
 	}
 
+	/**
+	 * Rename files in a folder
+	 * @param folder
+	   Aug 30, 2023
+	 */
 	private static void renameFiles (String folder) {
 
 		File parentFolder = new File(folder);
@@ -309,7 +318,13 @@ public class CompleteNeo4JGraphGenerator {
 
 
 
-
+	/**
+	 * Finalise the Neo4J dataset by re-joining the split and appropriately formatted CSV files after the filtering process is complete
+	 * @param tmpSplitFilesFiltered
+	 * @param joinedCSVOutputFolder
+	 * @throws IOException
+	   Aug 30, 2023
+	 */
 	public static void createNeo4JDataset (String tmpSplitFilesFiltered, String joinedCSVOutputFolder) throws IOException {
 
 		//process each sub-folder (e.g. consignments_split_filtered) in tmpSplitFilesFiltered
@@ -333,6 +348,12 @@ public class CompleteNeo4JGraphGenerator {
 
 	}
 
+	/**
+	 * Establishes relationships (CONSIGNMENT_INCLUDED_IN_WAVE) between Consignments that are included in a Wave and prints these relationships to a CSV file with appropriate Neo4J formatting.
+	 * @param consignmentCSV
+	 * @param CONSIGNMENT_INCLUDED_IN_WAVE
+	   Aug 30, 2023
+	 */
 	public static void generateConsignmentIncludedInWaveRel (String consignmentCSV, String CONSIGNMENT_INCLUDED_IN_WAVE) {
 
 		BufferedReader br = null;
@@ -376,6 +397,12 @@ public class CompleteNeo4JGraphGenerator {
 
 	}
 
+	/**
+	 * Establishes relationships (SHIPMENT_ITEM_IN_SHIPMENT) between Shipment Items that are referred to in a Shipment and prints these relationships to a CSV file with appropriate Neo4J formatting.
+	 * @param shipmentItemCSV
+	 * @param SHIPMENT_ITEM_IN_SHIPMENT
+	   Aug 30, 2023
+	 */
 	public static void generateShipmentItemInShipmentRel (String shipmentItemCSV, String SHIPMENT_ITEM_IN_SHIPMENT) {
 
 		BufferedReader br = null;
@@ -419,6 +446,12 @@ public class CompleteNeo4JGraphGenerator {
 
 	}
 
+	/**
+	 * Establishes relationships (SHIPMENT_ITEM_INCLUDES_LOADING_UNIT) between Loading Units that are referred to in a Shipment Item and prints these relationships to a CSV file with appropriate Neo4J formatting.
+	 * @param shipmentItemCSV
+	 * @param SHIPMENT_ITEM_INCLUDES_LOADING_UNIT
+	   Aug 30, 2023
+	 */
 	public static void generateShipmentItemIncludesLoadingUnitRel (String shipmentItemCSV, String SHIPMENT_ITEM_INCLUDES_LOADING_UNIT) {
 
 		BufferedReader br = null;
@@ -462,6 +495,12 @@ public class CompleteNeo4JGraphGenerator {
 
 	}
 
+	/**
+	 * Establishes relationships (XDLU_INCLUDED_IN_WAVE) between XDocLoadingUnits that are referred to in a Wave and prints these relationships to a CSV file with appropriate Neo4J formatting.
+	 * @param xdluCSV
+	 * @param XDLU_INCLUDED_IN_WAVE
+	   Aug 30, 2023
+	 */
 	public static void generateXdluIncludedInWaveRel (String xdluCSV, String XDLU_INCLUDED_IN_WAVE) {
 
 		BufferedReader br = null;
@@ -505,6 +544,12 @@ public class CompleteNeo4JGraphGenerator {
 
 	}
 
+	/**
+	 * Establishes relationships (XDLU_PROCESSED_BY_HUB) between XDocLoadingUnits that are processed by a Hub and prints these relationships to a CSV file with appropriate Neo4J formatting.
+	 * @param xdluCSV
+	 * @param XDLU_PROCESSED_BY_HUB
+	   Aug 30, 2023
+	 */
 	public static void generateXdluProcessedByHubRel (String xdluCSV, String XDLU_PROCESSED_BY_HUB) {
 
 		BufferedReader br = null;
@@ -548,6 +593,12 @@ public class CompleteNeo4JGraphGenerator {
 
 	}
 
+	/**
+	 * Establishes relationships (XDLU_INCLUDES_OUTBOUND_CONSIGNMENT) between Outbound Consignments that are referred to by an XDocLoadingUnit and prints these relationships to a CSV file with appropriate Neo4J formatting.
+	 * @param xdluCSV
+	 * @param XDLU_INCLUDES_OUTBOUND_CONSIGNMENT
+	   Aug 30, 2023
+	 */
 	public static void generateXdluIncludesOutboundConsignmentRel (String xdluCSV, String XDLU_INCLUDES_OUTBOUND_CONSIGNMENT) {
 
 		BufferedReader br = null;
@@ -591,6 +642,12 @@ public class CompleteNeo4JGraphGenerator {
 
 	}
 
+	/**
+	 * Establishes relationships (XDLU_INCLUDES_INBOUND_CONSIGNMENT) between Inbound Consignments that are referred to by an XDocLoadingUnit and prints these relationships to a CSV file with appropriate Neo4J formatting.
+	 * @param xdluCSV
+	 * @param XDLU_INCLUDES_INBOUND_CONSIGNMENT
+	   Aug 30, 2023
+	 */
 	public static void generateXdluIncludesInboundConsignmentRel (String xdluCSV, String XDLU_INCLUDES_INBOUND_CONSIGNMENT) {
 
 		BufferedReader br = null;
@@ -634,6 +691,12 @@ public class CompleteNeo4JGraphGenerator {
 
 	}
 
+	/**
+	 * Establishes relationships (XDLU_LOADING_UNIT) between Loading Units that are referred to by an XDocLoadingUnit and prints these relationships to a CSV file with appropriate Neo4J formatting.
+	 * @param xdluCSV
+	 * @param XDLU_LOADING_UNIT
+	   Aug 30, 2023
+	 */
 	public static void generateXdluLoadingUnitRel (String xdluCSV, String XDLU_LOADING_UNIT) {
 
 		BufferedReader br = null;
@@ -677,7 +740,12 @@ public class CompleteNeo4JGraphGenerator {
 
 	}
 
-
+	/**
+	 * Creates the necessary folder structure for storing the output files
+	 * @param parentFolder
+	 * @throws IOException
+	   Aug 30, 2023
+	 */
 	private static void createFolders(String parentFolder) throws IOException {
 
 		System.out.println("Creating folders: ");
@@ -720,6 +788,12 @@ public class CompleteNeo4JGraphGenerator {
 		Files.delete(path);
 	}
 
+	/**
+	 * Creates a new ShipmentItemId by concatenating the ShipmentId and the LoadingUnitId
+	 * @param inputFile
+	 * @throws IOException
+	   Aug 30, 2023
+	 */
 	private static void reformatShipmentItems (String inputFile) throws IOException {
 
 		BufferedReader br = null;

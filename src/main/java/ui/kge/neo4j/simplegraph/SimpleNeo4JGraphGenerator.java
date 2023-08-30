@@ -17,6 +17,12 @@ public class SimpleNeo4JGraphGenerator {
 	final static double CP_THRESHOLD = 0.75;
 
 	//test method
+	
+	/* Note: Prior to running the test method the following folders must be created:
+	./files/DATASETS/HubCentric/[with files max.csv, waves.csv and xdlu.csv]
+	./files/DATASETS/HubCentric/Nodes/
+	./files/DATASETS/HubCentric/Relationships
+	 */
 	public static void main(String[] args) throws IOException, ParseException {
 
 		String maxFile = "./files/DATASETS/SimpleNeo4JGraph/max.csv";
@@ -32,6 +38,16 @@ public class SimpleNeo4JGraphGenerator {
 
 	}
 	
+	/**
+	 * Creates a (Neo4J) knowledge graph with the hub-date combination being the core of the graph. From the hub as a core, the following relationships are added:
+	 * ShipmentsThroughput (Low or High) via hasThroughput
+	 * VolumeThroughput (Low or High) via hasThroughput
+	 * WeightThroughput (Low or High) via hasThroughput
+	 * PalletsThroughput (Low or High) via hasThroughput
+	 * BoxesThroughput (Low or High) via hasThroughput
+	 * @author audunvennesland
+	 *
+	 */
 	public static void createKnowledgeGraph (String maxFile, String wavesFile, String xdluFile, String trainingFrom, String trainingTo, String testFrom, String testTo) throws ParseException, IOException {
 
 		//get data from waves
@@ -196,6 +212,14 @@ public class SimpleNeo4JGraphGenerator {
 
 	}
 	
+	/**
+	 * Computes the RelativeToMaxCapacity (as an average of relativeMaxShipment (a particular date relative to a max value), relativeMaxVolume and relativeMaxWeight), 
+	 * and adds this as an attribute along with throughput measurements and a capacity prediction value (low vs high) that will be used in the training of the prediction. 
+	 * @param hubDataList
+	 * @param CP_THRESHOLD
+	 * @return
+	   Aug 30, 2023
+	 */
 	private static List<HubData> createCompleteHubDataList (List<HubData> hubDataList, double CP_THRESHOLD) throws IOException {
 
 		List<HubData> fullHubDataList = new ArrayList<HubData>();
@@ -296,6 +320,12 @@ public class SimpleNeo4JGraphGenerator {
 
 	}
 
+	/**
+	 * Associates wave data (qttShipments, qttBoxes and qttPallets) with a hub node entry. 
+	 * @param waves
+	 * @return
+	   Aug 30, 2023
+	 */
 	private static List<HubData> collectWaveData (String waves) {
 
 		//get data from waves
@@ -359,6 +389,12 @@ public class SimpleNeo4JGraphGenerator {
 
 	}
 
+	/**
+	 * Associates XDLU data (volume and weight) with a hub node entry
+	 * @param xdlu
+	 * @return
+	   Aug 30, 2023
+	 */
 	private static List<HubData> collectXDLUData (String xdlu) {
 
 		//get data from xdlu
@@ -418,6 +454,12 @@ public class SimpleNeo4JGraphGenerator {
 		return xdluHubDataList;
 	}
 
+	/**
+	 * Associates max data (maximum number of shipments, pallets and boxes + max amount of volume and weight) with a hub node entry. 
+	 * @param max
+	 * @return
+	   Aug 30, 2023
+	 */
 	private static List<HubData> collectMaxData (String max) {
 
 		//get max data
@@ -479,6 +521,14 @@ public class SimpleNeo4JGraphGenerator {
 
 	}
 
+	/**
+	 * Combines waves, XDLU and max data into a common set of values for a hub node entry.
+	 * @param wavesHubDataList
+	 * @param xdluHubDataList
+	 * @param maxList
+	 * @return
+	   Aug 30, 2023
+	 */
 	private static List<HubData> combineWaveXDLUMaxData (List<HubData> wavesHubDataList, List<HubData> xdluHubDataList, List<HubData> maxList) {
 
 		//iterate all three lists and create a common list
@@ -517,6 +567,14 @@ public class SimpleNeo4JGraphGenerator {
 
 	}
 
+	/**
+	 * Returns either a low or high weight throughput value
+	 * @param max
+	 * @param daily
+	 * @param threshold
+	 * @return
+	   Aug 30, 2023
+	 */
 	private static String computeWeightThroughputMeasurement (double max, double daily, double threshold) {
 
 		//round to 2 decimals
@@ -532,6 +590,14 @@ public class SimpleNeo4JGraphGenerator {
 		return weightThroughputMeasurement;
 	}
 
+	/**
+	 * Returns either a low or high volume throughput value
+	 * @param max
+	 * @param daily
+	 * @param threshold
+	 * @return
+	   Aug 30, 2023
+	 */
 	private static String computeVolumeThroughputMeasurement (double max, double daily, double threshold) {
 
 		//round to 2 decimals
@@ -547,6 +613,14 @@ public class SimpleNeo4JGraphGenerator {
 		return volumeTroughputMeasurement;
 	}
 
+	/**
+	 * Returns either a low or high shipments throughput value
+	 * @param max
+	 * @param daily
+	 * @param threshold
+	 * @return
+	   Aug 30, 2023
+	 */
 	private static String computeShipmentsThroughputMeasurement (int max, int daily, double threshold) {
 
 		//round to 2 decimals
@@ -562,6 +636,14 @@ public class SimpleNeo4JGraphGenerator {
 		return shipmentsThroughputMeasurement;
 	}
 
+	/**
+	 * Returns either a low or high pallets throughput value
+	 * @param max
+	 * @param daily
+	 * @param threshold
+	 * @return
+	   Aug 30, 2023
+	 */
 	private static String computePalletsThroughputMeasurement (int max, int daily, double threshold) {
 
 		//round to 2 decimals
@@ -577,6 +659,14 @@ public class SimpleNeo4JGraphGenerator {
 		return palletsThroughputMeasurement;
 	}
 
+	/**
+	 * Returns either a low or high boxes throughput value
+	 * @param max
+	 * @param daily
+	 * @param threshold
+	 * @return
+	   Aug 30, 2023
+	 */
 	private static String computeBoxesThroughputMeasurement (int max, int daily, double threshold) {
 
 		//round to 2 decimals
